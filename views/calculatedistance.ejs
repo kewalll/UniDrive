@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Passenger Next</title>
+    <link rel="stylesheet" href="../public/publisher2.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="../public/calculatedistance.css" />
+    <!-- <style>
+        #map { height: 500px;
+        width: 500px; 
+    flex: 1;} -->
+    <!-- </style> -->
+  </head>
+
+  <body
+    style="
+      background-color: #efeae3;
+      background-image: url(bgimage2.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+    "
+  >
+    <div id="main">
+      <div id="page1">
+        <nav>
+          <div style="display: flex; justify-content: space-between">
+            <img
+              id="logo-image"
+              onclick="window.location.href = '/home'"
+              src="../public/unidrive-high-resolution-logo-transparent.png"
+              alt=""
+              style="cursor: pointer"
+            />
+            <div id="nav-part2">
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/passenger'"
+                style="background-color: #227c70; color: #efeae3"
+              >
+                <a>Request a Ride</a>
+              </button>
+              <button class="nav-butt" onclick="window.location.href = '/publisher'">
+                <a>Publish a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/account'"
+              >
+                <a>Profile</a>
+              </button>
+            </div>
+            <h3>Menu</h3>
+          </div>
+        </nav>
+        <h1>Best Available Ride:</h1>
+        <div id="rider-container">
+          <div id="rider-container-elements">
+            <ul id="distanceList">
+              <!-- Distances will be dynamically added here -->
+            </ul>
+          </div>
+          <button
+            id="rider-container-elements2"
+            onclick="window.location.href ='https://checkout.stripe.com/c/pay/cs_test_a1sjiJzWnawDZfu7bUksMk476MKr9yLu0or6rqiAY1vr8ynhaGHK6E87Ho#fidkdWxOYHwnPyd1blpxYHZxWjA0SnJMcWpWRjxBM2ZmQnZGXF9DPGFtMnZKRDFmdEdCfVNOTWA3RFJWZGo3clZTUXxpRmN2N2FVRGh%2FZzBDQW4ydmBsdndTcW82QnxoaVZySml1a19UamhNNTVdVW9BXVdDVScpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl'"
+          >
+            CheckOut
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Function to fetch and display distances
+      async function fetchDistances() {
+        try {
+          const response = await fetch("/calculateDistances");
+          if (response.ok) {
+            const distances = await response.json();
+            displayDistances(distances);
+          } else {
+            console.error("Error fetching distances:", response.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching distances:", error);
+        }
+      }
+
+      // Function to display distances on the page
+      function displayDistances(distances) {
+        const distanceList = document.getElementById("distanceList");
+        distanceList.innerHTML = ""; // Clear previous list items
+        distances.forEach((distance, index) => {
+            const divItem = document.createElement("button");// Create a div element
+          divItem.textContent = `Driver${index + 1} is close to you. Distance: ${
+            distance.distance
+          } miles`; // Set the text content
+          distanceList.appendChild(divItem); // Append the div to the container
+        });
+      }
+
+      // Function to navigate back to the previous page
+      function goBack() {
+        window.history.back();
+      }
+
+      // Fetch distances when the page loads
+      window.onload = fetchDistances;
+    </script>
+    <script src="../public/publisher.js"></script>
+    <script
+      data-cfasync="false"
+      src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
+    ></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript"></script>
+  </body>
+</html>
