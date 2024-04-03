@@ -1,74 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile</title>
-    <link rel="stylesheet" href="../public/publisher2.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="../public/publisher2.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-    <link rel="stylesheet" href="../public/publisher.css">
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="../public/publisher.css" />
     <!-- <style>
         #map { height: 500px;
         width: 500px; 
     flex: 1;} -->
     <!-- </style> -->
-</head>
+  </head>
 
-<body style="
-background-color: #EFEAE3;
-background-image: url(bgimage2.jpg);
-background-repeat: no-repeat;
-background-size: cover;">
-<div id="main">
-    <div id="page1">
+  <body
+    style="
+      background-color: #efeae3;
+      background-image: url(bgimage2.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+    "
+  >
+    <div id="main">
+      <div id="page1">
         <nav>
-            <div style="
-            display:flex;
-            justify-content: space-between;">
-                <img id="logo-image" onclick=
-                "window.location.href = '/home'" src="../public/unidrive-high-resolution-logo-transparent.png"
-                alt="" style="cursor:pointer;">
+          <div style="display: flex; justify-content: space-between">
+            <img
+              id="logo-image"
+              onclick="window.location.href = '/home'"
+              src="../public/unidrive-high-resolution-logo-transparent.png"
+              alt=""
+              style="cursor: pointer"
+            />
             <div id="nav-part2">
-                <button class="nav-butt" onclick=
-                "window.location.href = '/passenger'" style="
-                background-color: #227C70;
-                color: #EFEAE3;"><a >Request a Ride</a></button>
-                <button class="nav-butt" onclick=
-                "window.location.href = '/publisher'"><a >Publish a Ride</a></button>
-                <button class="nav-butt" onclick=
-                "window.location.href = '/account'"><a >Profile</a></button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/passenger'"
+                style="background-color: #227c70; color: #efeae3"
+              >
+                <a>Request a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/publisher'"
+              >
+                <a>Publish a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/account'"
+              >
+                <a>Profile</a>
+              </button>
             </div>
             <h3>Menu</h3>
-            </div>
+          </div>
         </nav>
         <div id="map-container">
-            <div id="map"></div>
-            <div id="saerch-bar-div">
-                <div id="geocoder" class="geocoder"></div>
-            </div>
-            <div id="publisher-button-container">
-                <!-- <div><input type="time" id="map-button2" class="depart-time" placeholder="Departure Time" name="departure">
+          <div id="map"></div>
+          <div id="saerch-bar-div">
+            <div id="geocoder" class="geocoder"></div>
+          </div>
+          <div id="publisher-button-container">
+            <!-- <div><input type="time" id="map-button2" class="depart-time" placeholder="Departure Time" name="departure">
                     <i id="map-button3" class="bx bx-user">Time of Departure:</i></div> -->
-                <div><button id="map-button" onclick="window.location.href = '/calculatedistance'">Request</button></div>
-                <!-- <div><input type="text" id="map-button1" class="seats" placeholder="Available Seats" name="availableseats">
-                    <i class="bx bx-user"></i></div> -->
+            <div>
+              <button
+                id="request-button"
+                onclick="window.location.href = '/calculatedistance'"
+              >
+                Request
+              </button>
             </div>
+            <!-- <div><input type="text" id="map-button1" class="seats" placeholder="Available Seats" name="availableseats">
+                    <i class="bx bx-user"></i></div> -->
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<script src="../public/passenger.js"></script>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="../public/passenger.js"></script>
+    <script
+      data-cfasync="false"
+      src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
+    ></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript">
-
-    </script>
-    
-</body>
-
+    <script type="text/javascript"></script>
+  </body>
 </html>

@@ -1,5 +1,4 @@
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w";
+mapboxgl.accessToken = "pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w";
 
 const createLocation2 = async (data) => {
   console.log("data: " + JSON.stringify(data));
@@ -14,9 +13,6 @@ const createLocation2 = async (data) => {
 
     console.log("options: " + JSON.stringify(options));
     const response = await fetch("/storeLocation2", options);
-
-    // console.log("response: " + response);
-
     return await response.json();
   } catch (error) {
     console.error("Error:", error);
@@ -36,32 +32,35 @@ var geocoder = new MapboxGeocoder({
 });
 
 geocoder.on("result", async function (e) {
-  // e.preventDefault();
-  x = e.result;
-  y = x.center;
-  z = y[0]+','+y[1];
-  console.log(z);
-  new mapboxgl.Marker().setLngLat(e.result.geometry.coordinates).addTo(map);
+  // Update the map with the searched location
+  const marker = new mapboxgl.Marker().setLngLat(e.result.geometry.coordinates).addTo(map);
 
-  const response = await createLocation2({ location2: y });
-  fetch(
-    "https://api.mapbox.com/directions/v5/mapbox/driving/" +
-      z +
-      ";73.7279,18.5413?geometries=geojson&access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w"
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      const distance = data.routes[0].distance / 1000; // Converting meters to kilometers
-      console.log("Distance (in km):", distance);
+  // Store the location data in a variable
+  const location2Data = {
+    location2: e.result.center,
+    marker: marker
+  };
 
-      const fare = 20 + (distance - 3) * 5; // Assuming Rs. 5 per kilometer after the initial 3 kilometers
-      console.log("Fare: Rs.", fare);
-    })
-    .catch((error) => {
+  // Attach a click event listener to the "request" button
+  document.getElementById("request-button").addEventListener("click", async function () {
+    try {
+      // Save the location to the database when the "request" button is clicked
+      const response = await createLocation2({
+        location2: location2Data.location2,
+      });
+      console.log("Location published:", response);
+
+      // Remove the marker from the map after publishing
+      location2Data.marker.remove();
+
+      // Fetch the saved location coordinates directly
+      const fetchResponse = await fetch("/fetchLocationCoordinates");
+      const fetchedLocation = await fetchResponse.json();
+      console.log("Fetched Location:", fetchedLocation);
+    } catch (error) {
       console.error("Error:", error);
-    });
-
-  // Store the result somewhere, e.g., in a global variable or send to a server
+    }
+  });
 });
 
 document.getElementById("geocoder").appendChild(geocoder.onAdd(map));

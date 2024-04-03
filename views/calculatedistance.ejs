@@ -1,133 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Passenger Next</title>
-    <link rel="stylesheet" href="../public/publisher2.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
-      type="text/css"
-    />
-    <link rel="stylesheet" href="../public/calculatedistance.css" />
-    <!-- <style>
-        #map { height: 500px;
-        width: 500px; 
-    flex: 1;} -->
-    <!-- </style> -->
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fetch Published Rides</title>
+</head>
+<body>
+  <ul id="distances-list"></ul>
+  <!-- Your HTML content here -->
 
-  <body
-    style="
-      background-color: #efeae3;
-      background-image: url(bgimage2.jpg);
-      background-repeat: no-repeat;
-      background-size: cover;
-    "
-  >
-    <div id="main">
-      <div id="page1">
-        <nav>
-          <div style="display: flex; justify-content: space-between">
-            <img
-              id="logo-image"
-              onclick="window.location.href = '/home'"
-              src="../public/unidrive-high-resolution-logo-transparent.png"
-              alt=""
-              style="cursor: pointer"
-            />
-            <div id="nav-part2">
-              <button
-                class="nav-butt"
-                onclick="window.location.href = '/passenger'"
-                style="background-color: #227c70; color: #efeae3"
-              >
-                <a>Request a Ride</a>
-              </button>
-              <button class="nav-butt" onclick="window.location.href = '/publisher'">
-                <a>Publish a Ride</a>
-              </button>
-              <button
-                class="nav-butt"
-                onclick="window.location.href = '/account'"
-              >
-                <a>Profile</a>
-              </button>
-            </div>
-            <h3>Menu</h3>
-          </div>
-        </nav>
-        <h1>Best Available Ride:</h1>
-        <div id="rider-container">
-          <div id="rider-container-elements">
-            <ul id="distanceList">
-              <!-- Distances will be dynamically added here -->
-            </ul>
-          </div>
-          <button
-            id="rider-container-elements2"
-            onclick="window.location.href ='https://checkout.stripe.com/c/pay/cs_test_a1sjiJzWnawDZfu7bUksMk476MKr9yLu0or6rqiAY1vr8ynhaGHK6E87Ho#fidkdWxOYHwnPyd1blpxYHZxWjA0SnJMcWpWRjxBM2ZmQnZGXF9DPGFtMnZKRDFmdEdCfVNOTWA3RFJWZGo3clZTUXxpRmN2N2FVRGh%2FZzBDQW4ydmBsdndTcW82QnxoaVZySml1a19UamhNNTVdVW9BXVdDVScpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl'"
-          >
-            CheckOut
-          </button>
-        </div>
-      </div>
-    </div>
-    <script>
-      // Function to fetch and display distances
-      async function fetchDistances() {
-        try {
-          const response = await fetch("/calculateDistances");
-          if (response.ok) {
-            const distances = await response.json();
-            displayDistances(distances);
-          } else {
-            console.error("Error fetching distances:", response.statusText);
-          }
-        } catch (error) {
-          console.error("Error fetching distances:", error);
+  <script>
+    // Modified fetch code to fetch published rides and log them to the console
+    fetch("/fetchPublishedRides")
+      .then((response) => response.json())
+      .then((publishedRides) => {
+        console.log("Published Rides:", publishedRides);
+
+        // Get user's location using HTML Geolocation API
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLatitude = position.coords.latitude;
+              const userLongitude = position.coords.longitude;
+
+              // Array to store distances for each ride
+              const distancesList = [];
+
+              // Calculate distance between user's location and each published ride's location
+              publishedRides.forEach((ride) => {
+                const rideLatitude = parseFloat(ride.coordinates.split(",")[1]);
+                const rideLongitude = parseFloat(ride.coordinates.split(",")[0]);
+                const distance = calculateDistance(
+                  userLatitude,
+                  userLongitude,
+                  rideLatitude,
+                  rideLongitude
+                );
+                console.log("Distance to ride:", distance, "km");
+
+                // Store the distance for each ride
+                distancesList.push({ rideId: ride._id, distance });
+              });
+
+              // Display distances on the web page
+              displayDistances(distancesList);
+
+              // Send the distances data to the server
+              sendDistancesToServer(distancesList);
+            },
+            (error) => {
+              console.error("Error getting user location:", error);
+            }
+          );
+        } else {
+          console.error("Geolocation is not supported by this browser.");
         }
-      }
+      })
+      .catch((error) =>
+        console.error("Error fetching published rides:", error)
+      );
 
-      // Function to display distances on the page
-      function displayDistances(distances) {
-        const distanceList = document.getElementById("distanceList");
-        distanceList.innerHTML = ""; // Clear previous list items
-        distances.forEach((distance, index) => {
-            const divItem = document.createElement("button");// Create a div element
-          divItem.textContent = `Driver${index + 1} is close to you. Distance: ${
-            distance.distance
-          } miles`; // Set the text content
-          distanceList.appendChild(divItem); // Append the div to the container
-        });
-      }
+    // Function to calculate distance between two points using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radius of the Earth in kilometers
+      const dLat = deg2rad(lat2 - lat1);
+      const dLon = deg2rad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) *
+          Math.cos(deg2rad(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c; // Distance in kilometers
+      return distance;
+    }
 
-      // Function to navigate back to the previous page
-      function goBack() {
-        window.history.back();
-      }
+    // Function to convert degrees to radians
+    function deg2rad(deg) {
+      return deg * (Math.PI / 180);
+    }
 
-      // Fetch distances when the page loads
-      window.onload = fetchDistances;
-    </script>
-    <script src="../public/publisher.js"></script>
-    <script
-      data-cfasync="false"
-      src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
-    ></script>
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript"></script>
-  </body>
+    // Function to display distances on the web page
+    function displayDistances(distancesList) {
+      // Get the distances list element
+      const distancesListElement = document.getElementById('distances-list');
+
+      // Clear previous content
+      distancesListElement.innerHTML = '';
+
+      // Append distances to the list
+      distancesList.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Ride ID: ${item.rideId}, Distance: ${item.distance} km`;
+        distancesListElement.appendChild(listItem);
+      });
+    }
+
+    // Function to send distances data to the server
+    function sendDistancesToServer(distancesList) {
+      fetch('/calculateDistances', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ distances: distancesList }) // Send the distances data to the server
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Distances data sent to server:', data);
+      })
+      .catch(error => console.error('Error sending distances data to server:', error));
+    }
+  </script>
+</body>
 </html>
