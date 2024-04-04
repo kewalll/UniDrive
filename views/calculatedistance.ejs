@@ -10,23 +10,24 @@
     <!-- Your HTML content here -->
 
     <script>
-      // Modified fetch code to fetch published rides and log them to the console
-      fetch("/fetchPublishedRides")
+      // JavaScript code goes here
+      // Fetch location2 from the server
+      fetch("/getLocation2")
         .then((response) => response.json())
-        .then((publishedRides) => {
-          console.log("Published Rides:", publishedRides);
+        .then((data) => {
+          const location2 = data.location2;
+          console.log("Location2:", location2);
 
-          // Get user's location using HTML Geolocation API
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const userLatitude = position.coords.latitude;
-                const userLongitude = position.coords.longitude;
-                console.log(userLatitude, userLongitude);
-                // Array to store distances for each ride
-                const distancesList = [];
+          // Now you can use location2 in your fetch request to /fetchPublishedRides and other functions
+          fetch("/fetchPublishedRides")
+            .then((response) => response.json())
+            .then((publishedRides) => {
+              // Array to store distances for each ride
+              const distancesList = [];
 
-                // Calculate distance between user's location and each published ride's location
+              // Check if location2 is defined
+              if (location2) {
+                // Calculate distance between location2 and each published ride's location
                 publishedRides.forEach((ride) => {
                   const rideLatitude = parseFloat(
                     ride.coordinates.split(",")[1]
@@ -35,8 +36,8 @@
                     ride.coordinates.split(",")[0]
                   );
                   const distance = calculateDistance(
-                    userLatitude,
-                    userLongitude,
+                    location2[1],
+                    location2[0],
                     rideLatitude,
                     rideLongitude
                   );
@@ -51,59 +52,35 @@
 
                 // Send the distances data to the server
                 sendDistancesToServer(distancesList);
-              },
-              (error) => {
-                console.error("Error getting user location:", error);
+              } else {
+                console.error("Location2 is undefined");
               }
+            })
+            .catch((error) =>
+              console.error("Error fetching published rides:", error)
             );
-          } else {
-            console.error("Geolocation is not supported by this browser.");
-          }
-        })
-        .catch((error) =>
-          console.error("Error fetching published rides:", error)
-        );
+        });
 
       // Function to calculate distance between two points using Haversine formula
-      // function calculateDistance(lat1, lon1, lat2, lon2) {
-      //   const R = 6371; // Radius of the Earth in kilometers
-      //   const dLat = deg2rad(lat2 - lat1);
-      //   const dLon = deg2rad(lon2 - lon1);
-      //   const a =
-      //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      //     Math.cos(deg2rad(lat1)) *
-      //       Math.cos(deg2rad(lat2)) *
-      //       Math.sin(dLon / 2) *
-      //       Math.sin(dLon / 2);
-      //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      //   const distance = R * c; // Distance in kilometers
-      //   return distance;
-      // }
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(deg2rad(lat1)) *
+            Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Distance in kilometers
+        return distance;
+      }
 
-      // // Function to convert degrees to radians
-      // function deg2rad(deg) {
-      //   return deg * (Math.PI / 180);
-      // }
-      function calculateDistance(lat1, lon1, lat2, lon2, radius = 6371) {
-      const R = radius; // Earth's radius in kilometers
-      const dLat = (Math.PI * (lat2 - lat1)) / 180; // Convert degrees to radians
-      const dLon = (Math.PI * (lon2 - lon1)) / 180;
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.PI * lat1 / 180) * Math.cos(Math.PI * lat2 / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-      return distance;
-}
-
-// Example usage
-// const latitude1 = 36.12; // Nashville, US
-// const longitude1 = -86.67;
-// const latitude2 = 33.94; // Los Angeles, US
-// const longitude2 = -118.40;
-
-    const distance = calculateDistance(lat1, lon1, lat2, lon2);
-    console.log(`The distance between Nashville and Los Angeles is approximately ${distance.toFixed(2)} kilometers.`);
+      // Function to convert degrees to radians
+      function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+      }
 
       // Function to display distances on the web page
       function displayDistances(distancesList) {

@@ -353,10 +353,10 @@ app.get('/fetchPublishedRides', async (req, res) => {
 //     });
 
 //     // Log distances to the console
-//     console.log(`Distances for Location2 ${location2._id}:`);
+//     console.log(Distances for Location2 ${location2._id}:);
 //     distances.forEach((distance) => {
 //       console.log(
-//         `Location ${distance.location} to Location2 ${distance.location2}: ${distance.distance} miles`
+//         Location ${distance.location} to Location2 ${distance.location2}: ${distance.distance} miles
 //       );
 //     });
 
@@ -668,6 +668,23 @@ app.post("/verify_otp", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.render("landing"); // Render the 'login.ejs' template
+});
+let location2;
+
+app.post("/processLocation", (req, res) => {
+  const { location2: receivedLocation2 } = req.body;
+  console.log("Received location2:", receivedLocation2);
+
+  // Assign the received location2 to the global variable
+  location2 = receivedLocation2;
+  // Here you can process the location2 data as needed, such as performing calculations or additional actions
+  //calculateDistance(location2);
+  // Send a response back to the client
+  //res.json({ message: "Location data received successfully" });
+  res.render("calculatedistance", { location2 });
+});
+app.get('/getLocation2', (req, res) => {
+  res.json({ location2 });
 });
 
 // Start server
