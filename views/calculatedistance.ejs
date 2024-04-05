@@ -4,10 +4,78 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fetch Published Rides</title>
+    <link rel="stylesheet" href="../public/calculatedistance.css" />
   </head>
-  <body>
-    <ul id="distances-list"></ul>
+  <body style="background-color: #efeae3">
+    <div id="main">
+      <div id="page1">
+        <nav style="display: flex">
+          <div style="display: flex; flex: 1; justify-content: space-between">
+            <img
+              id="logo-image"
+              onclick="window.location.href = '/home'"
+              src="../public/unidrive-high-resolution-logo-transparent.png"
+              alt=""
+              style="cursor: pointer"
+            />
+            <div id="nav-part2">
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/passenger'"
+                style="background-color: #227c70; color: #efeae3"
+              >
+                <a>Request a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/publisher'"
+              >
+                <a>Publish a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href='/account'"
+              >
+                <a>Profile</a>
+              </button>
+            </div>
+            <h3>Menu</h3>
+          </div>
+        </nav>
+        <div class="request-details-container">
+          <div class="available-drivers-container">
+            <h1
+              style="
+                font-family: sans-serif;
+                font-weight: 300;
+                margin-bottom: 2rem;
+              "
+            >
+              Available rides:
+            </h1>
+            <div id="distances-list"></div>
+          </div>
+          <div class="fair-container">
+            <h1
+              style="
+                font-family: sans-serif;
+                font-weight: 300;
+                margin-bottom: 2rem;
+              "
+            >
+              Approximate Fare:
+            </h1>
+            <div id="distances-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Your HTML content here -->
+    <!-- Your HTML content here -->
+    <div id="fare-output">Fare:</div>
+    <button id="female" onclick="window.location.href = 'femalerides'">
+      female rides
+    </button>
 
     <script>
       // JavaScript code goes here
@@ -22,8 +90,8 @@
           fetch("/fetchPublishedRides")
             .then((response) => response.json())
             .then((publishedRides) => {
-              // Array to store distances for each ride
-              const distancesList = [];
+              // Array to store promises for each distance calculation
+              const distancePromises = [];
 
               // Check if location2 is defined
               if (location2) {
@@ -35,26 +103,42 @@
                   const rideLongitude = parseFloat(
                     ride.coordinates.split(",")[0]
                   );
-                  const distance = calculateDistance(
-                    location2[1],
-                    location2[0],
-                    rideLatitude,
-                    rideLongitude
-                  );
-                  console.log("Distance to ride:", distance, "km");
 
-                  // Store the distance for each ride
-                  distancesList.push({ rideId: ride._id, distance });
+                  // Push the promise returned by calculateDistance to the array
+                  distancePromises.push(
+                    calculateDistance(
+                      location2[1],
+                      location2[0],
+                      rideLatitude,
+                      rideLongitude
+                    ).then((distance) => ({
+                      firstname: ride.firstname,
+                      lastname: ride.lastname,
+                      gender: ride.gender,
+                      availableSeats: ride.availableSeats,
+                      departTime: ride.departTime,
+                      email: ride.email,
+                      distance,
+
+                      // rideId: ride._id,
+                    })) // Resolve the promise with rideId and distance
+                  );
+                  calculateFare(location2);
                 });
 
-                // Display distances on the web page
-                displayDistances(distancesList);
-
-                // Send the distances data to the server
-                sendDistancesToServer(distancesList);
+                // Wait for all distance calculations to complete
+                return Promise.all(distancePromises);
               } else {
                 console.error("Location2 is undefined");
+                return []; // Return an empty array if location2 is undefined
               }
+            })
+            .then((distancesList) => {
+              // Display distances on the web page
+              displayDistances(distancesList);
+
+              // Send the distances data to the server
+              sendDistancesToServer(distancesList);
             })
             .catch((error) =>
               console.error("Error fetching published rides:", error)
@@ -62,19 +146,27 @@
         });
 
       // Function to calculate distance between two points using Haversine formula
-      function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Radius of the Earth in kilometers
-        const dLat = deg2rad(lat2 - lat1);
-        const dLon = deg2rad(lon2 - lon1);
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(deg2rad(lat1)) *
-            Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c; // Distance in kilometers
-        return distance;
+      async function calculateDistance(lat1, lon1, lat2, lon2) {
+        const link =
+          "https://api.mapbox.com/directions/v5/mapbox/driving/" +
+          lon1 +
+          "," +
+          lat1 +
+          ";" +
+          lon2 +
+          "," +
+          lat2 +
+          "?access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w";
+        try {
+          const response = await fetch(link);
+          const data = await response.json();
+          const distanceInMeters = data.routes[0].distance;
+          const distanceInKilometers = distanceInMeters / 1000;
+          return distanceInKilometers;
+        } catch (error) {
+          console.error("Error calculating distance:", error);
+          throw error;
+        }
       }
 
       // Function to convert degrees to radians
@@ -93,7 +185,13 @@
         // Append distances to the list
         distancesList.forEach((item) => {
           const listItem = document.createElement("li");
-          listItem.textContent = `Ride ID: ${item.rideId}, Distance: ${item.distance} km`;
+          listItem.classList.add("distance-item");
+          // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
+          listItem.textContent = `Name:${item.firstname + item.lastname}
+               Distance: ${item.distance} km,    
+               availableSeats:${item.availableSeats},    
+               Departure tt:${item.departTime},
+                Gender:${item.gender}`;
           distancesListElement.appendChild(listItem);
         });
       }
@@ -114,6 +212,49 @@
           .catch((error) =>
             console.error("Error sending distances data to server:", error)
           );
+      }
+      async function calculateFare(location2) {
+        // Assuming fare calculation based on location2 and distancesList
+        // You can modify this function according to your fare calculation logic
+        const destinationLat = 18.541007;
+        const destinationLon = 73.72778;
+        const link = `https://api.mapbox.com/directions/v5/mapbox/driving/${location2[0]},${location2[1]};${destinationLon},${destinationLat}?access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w`;
+
+        try {
+          const response = await fetch(link);
+          const data = await response.json();
+          const distanceInMeters = data.routes[0].distance;
+          const distanceInKilometers = distanceInMeters / 1000;
+
+          let totalFare = 0;
+
+          if (distanceInKilometers <= 3) {
+            // If distance is less than or equal to 3 km, use base fare for first 3 km
+            totalFare += 20;
+          } else {
+            // If distance is greater than 3 km, calculate fare based on additional km
+            totalFare += 20 + (distanceInKilometers - 3) * 7;
+          }
+          totalFare = totalFare.toFixed(2);
+          // Display fare in a separate section
+          displayFare(totalFare);
+        } catch (error) {
+          console.error("Error calculating distance:", error);
+          throw error;
+        }
+      }
+
+      function displayFare(fare) {
+        // Get the fare output element
+        const fareOutput = document.getElementById("fare-output");
+
+        // Clear previous content
+        fareOutput.innerHTML = "";
+
+        // Display fare
+        const fareElement = document.createElement("p");
+        fareElement.textContent = ` Fare: Rs.${fare}/-`;
+        fareOutput.appendChild(fareElement);
       }
     </script>
   </body>

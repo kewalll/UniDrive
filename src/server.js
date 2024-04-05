@@ -11,6 +11,7 @@ const stripe = require("stripe")(
 );
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
+const axios = require('axios');
 
 dotenv.config();
 const bcrypt = require("bcrypt");
@@ -139,23 +140,23 @@ const LocationSchema = new mongoose.Schema({
     required: true,
   },
   user: {
-    type: String, // Corrected type to represent email as a string
+    type: mongoose.Schema.Types.ObjectId, // Storing ObjectId of the user
     ref: "User", // Referencing the User model
     required: true,
   },
   firstname: {
     type: String,
-    ref: "User",
+    ref: "User", // Optionally, you can reference the User model for convenience
     required: true,
   },
   lastname: {
     type: String,
-    ref: "User",
+    ref: "User", // Optionally, you can reference the User model for convenience
     required: true,
   },
   gender: {
     type: String,
-    ref: "User",
+    ref: "User", // Optionally, you can reference the User model for convenience
     required: true,
   },
   departTime: {
@@ -163,7 +164,7 @@ const LocationSchema = new mongoose.Schema({
     required: true,
   },
   availableSeats: {
-    type: Number, // Assuming availableSeats will be stored as a number
+    type: Number,
     required: true,
   },
 });
@@ -262,13 +263,12 @@ app.post("/storeLocation", isLoggedIn, async (req, res) => {
     // Create a new Location document associated with the logged-in user
     const newLocation = new Location({
       coordinates: location.toString(),
-      user: loggedInUser.email,
+      user: loggedInUser._id, // Use the ObjectId of the logged-in user
       firstname: loggedInUser.firstname,
       lastname: loggedInUser.lastname,
       gender: loggedInUser.gender,
       departTime: parsedDepartTime,
       availableSeats: availableSeats,
-      // Assigning the ObjectId of the logged-in user
     });
 
     await newLocation.save();
@@ -278,6 +278,7 @@ app.post("/storeLocation", isLoggedIn, async (req, res) => {
     res.sendStatus(500); // Send an error response
   }
 });
+
 app.post("/storeLocation2", isLoggedIn, async (req, res) => {
   try {
     const { location2 } = req.body;
@@ -306,13 +307,34 @@ app.post("/storeLocation2", isLoggedIn, async (req, res) => {
 });
 app.get('/fetchPublishedRides', async (req, res) => {
   try {
-    const publishedRides = await Location.find();
+    const publishedRides = await Location.find()
+      .populate('user'); // Populate user details
     res.json(publishedRides);
   } catch (error) {
     console.error('Error fetching published rides:', error);
     res.sendStatus(500);
   }
 });
+
+// app.get('/fetchPublishedRides', async (req, res) => {
+//   try {
+//     const publishedRides = await Location.find()
+//       .populate('user'); // Populate user details
+
+//     // Convert coordinates to location
+//     const updatedRides = await Promise.all(publishedRides.map(async (ride) => {
+//       const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${ride.latitude},${ride.longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`);
+//       const location = response.data.results[0].formatted_address;
+//       return { ...ride._doc, location }; // Merge location into ride object
+//     }));
+
+//     res.json(updatedRides);
+//   } catch (error) {
+//     console.error('Error fetching published rides:', error);
+//     res.sendStatus(500);
+//   }
+// });
+
 // Import Turf.js for distance calculation
 
 // Route to calculate distances between Location2 and all Location data for the current user
@@ -417,6 +439,9 @@ app.get("/success", (req, res) => {
 });
 app.get("/checkout", (req, res) => {
   res.render("checkout");
+});
+app.get("/femalerides", (req, res) => {
+  res.render("femalerides");
 });
 app.get("/account", isLoggedIn, async (req, res) => {
   try {
@@ -684,8 +709,25 @@ app.post("/processLocation", (req, res) => {
   res.render("calculatedistance", { location2 });
 });
 app.get('/getLocation2', (req, res) => {
-  res.json({ location2 });
+  try {
+    const loggedInUser = req.session.user;
+    /* fetch location2 from wherever it's stored */;
+
+    // Combine the user details and location2 into a single JSON object
+    const responseData = {
+      user: loggedInUser,
+      gender: loggedInUser.gender,
+      location2: location2 // Assuming location2 is fetched from somewhere else in your code
+    };
+
+    // Send the combined data as the JSON response
+    res.json(responseData);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.sendStatus(500); // Send an error response if something goes wrong
+  }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
