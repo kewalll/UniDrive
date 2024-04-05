@@ -11,7 +11,7 @@ const stripe = require("stripe")(
 );
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
-const axios = require('axios');
+
 
 dotenv.config();
 const bcrypt = require("bcrypt");
@@ -316,24 +316,6 @@ app.get('/fetchPublishedRides', async (req, res) => {
   }
 });
 
-// app.get('/fetchPublishedRides', async (req, res) => {
-//   try {
-//     const publishedRides = await Location.find()
-//       .populate('user'); // Populate user details
-
-//     // Convert coordinates to location
-//     const updatedRides = await Promise.all(publishedRides.map(async (ride) => {
-//       const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${ride.latitude},${ride.longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`);
-//       const location = response.data.results[0].formatted_address;
-//       return { ...ride._doc, location }; // Merge location into ride object
-//     }));
-
-//     res.json(updatedRides);
-//   } catch (error) {
-//     console.error('Error fetching published rides:', error);
-//     res.sendStatus(500);
-//   }
-// });
 
 // Import Turf.js for distance calculation
 
