@@ -11,7 +11,27 @@ const stripe = require("stripe")(
 );
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
+let location2;
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
 
+// Function to broadcast coordinates to all connected clients
+function broadcastCoordinates(data) {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(data));
+    }
+  });
+}
+setInterval(() => {
+  // Generate random coordinates for demonstration purposes
+  const randomLng = Math.random() * 360 - 180;
+  const randomLat = Math.random() * 180 - 90;
+  const coordinates = `${randomLng},${randomLat}`;
+
+  // Broadcast the updated coordinates to all clients
+  broadcastCoordinates({ coordinates });
+}, 5000);
 
 dotenv.config();
 const bcrypt = require("bcrypt");
@@ -212,10 +232,152 @@ const Location2Schema = new mongoose.Schema({
     required: true,
   },
 });
+const DriverSchema = new mongoose.Schema({
+  email: {
+      type: String,
+      required: true
+  },
+  gender: {
+      type: String,
+      required: true
+  },
+  coordinates: {
+      type: String, // Assuming coordinates are stored as a string
+      required: true
+  },
+  firstname: {
+      type: String,
+      required: true
+  },
+  lastname: {
+      type: String,
+      required: true
+  },
+  distance: {
+      type: Number,
+      required: true
+  }
+});
+const riderSchema = new mongoose.Schema({
+  email: {
+      type: String,
+      required: true
+  },
+  gender: {
+      type: String,
+      required: true
+  },
+ 
+  firstname: {
+      type: String,
+      required: true
+  },
+  lastname: {
+      type: String,
+      required: true
+  },
+  location2:{
+    type:[Number],
+    required:true
+  }
+  
+});
+const TestSchema = new mongoose.Schema({
+  dmail: {
+      type: String,
+      required: true
+  },
+  dgender: {
+      type: String,
+      required: true
+  },
+  dcoordinates: {
+      type: String, // Assuming coordinates are stored as a string
+      required: true
+  },
+  dfirstname: {
+      type: String,
+      required: true
+  },
+  dlastname: {
+      type: String,
+      required: true
+  },
+  ddistance: {
+      type: Number,
+      required: true
+  },
+  remail: {
+    type: String,
+    required: true
+},
+rgender: {
+    type: String,
+    required: true
+},
+
+rfirstname: {
+    type: String,
+    required: true
+},
+rlastname: {
+    type: String,
+    required: true
+},
+rlocation2:{
+  type:[Number],
+  required:true
+}
+});
+
+
 
 // Define the Location model
 const Location = mongoose.model("Location", LocationSchema);
 const Location2 = mongoose.model("Location2", Location2Schema);
+const Driver = mongoose.model("Driver", DriverSchema);
+const Rider = mongoose.model("Rider", riderSchema);
+module.exports = Rider;
+const Test = mongoose.model("test", TestSchema);
+
+module.exports = Test;
+
+app.post('/driverdata', async (req, res) => {
+  try {
+      // Extract data from the request body
+      const { email, gender, coordinates, firstname, lastname, distance } = req.body;
+      const location2 = req.session.location2; 
+      const loggedInUser = req.session.user;
+
+      // Create a new instance of your model with the extracted data
+      const newData = new Test({
+          dmail :email,
+          dgender : gender,
+          dcoordinates:coordinates,
+          dfirstname:firstname,
+          dlastname:lastname,
+          ddistance:distance,
+          rfirstname: loggedInUser.firstname,
+                rlastname: loggedInUser.lastname,
+                remail: loggedInUser.email,
+                rgender: loggedInUser.gender,
+                rcoordinates:loggedInUser.coordinates,
+                rlocation2: location2
+      });
+
+      // Save the data to the database
+      await newData.save();
+      broadcastCoordinates({ coordinates });
+
+      // Send a success response
+      res.status(201).json({ message: 'Data saved successfully' });
+  } catch (error) {
+      // If an error occurs, send an error response
+      console.error('Error saving data:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Assuming you've already connected to MongoDB using mongoose, as shown in your previous code
 
@@ -297,6 +459,7 @@ app.post("/storeLocation", isLoggedIn, async (req, res) => {
     res.sendStatus(500); // Send an error response
   }
 });
+
 
 app.post("/storeLocation2", isLoggedIn, async (req, res) => {
   try {
@@ -404,6 +567,7 @@ const transporter = nodemailer.createTransport({
 // Define a route to handle sending emails
 app.post('/sendEmail',isLoggedIn, async(req, res) => {
   const { email } = req.body;
+  const location2 = req.session.location2; 
 
   const loggedInUser = req.session.user;
   const otp = otpGenerator.generate(6, {
@@ -429,18 +593,36 @@ app.post('/sendEmail',isLoggedIn, async(req, res) => {
              Your OTP to start ride is  is: ${otp}`
   };
 
-  // Send email
-  transporter.sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, async (error, info) => {
     if (error) {
-      console.log(error);
-      res.status(500).send('Error sending email');
+        console.log(error);
+        res.status(500).send('Error sending email');
     } else {
-      console.log('Email sent: ' + info.response);
-      res.status(200).send('Email sent successfully');
-       res.redirect("/otp_verification2");
+        console.log('Email sent: ' + info.response);
+
+        // Save user data to the database
+        try {
+            const newRider = new Rider({
+                firstname: loggedInUser.firstname,
+                lastname: loggedInUser.lastname,
+                email: loggedInUser.email,
+                gender: loggedInUser.gender,
+                coordinates:loggedInUser.coordinates,
+                location2: location2
+                
+                // Add other properties as needed
+            });
+            const savedRider = await newRider.save();
+            console.log('User data saved to database:', savedRider);
+
+            // Redirect the user to "/otp_verification2" after email is sent and user data is saved
+            res.redirect("/otp_verification2");
+        } catch (saveError) {
+            console.error('Error saving user data:', saveError);
+            res.status(500).send('Error saving user data.');
+        }
     }
-    
-  });
+});
  
 });
 
@@ -557,7 +739,9 @@ app.get("/otp_verification2", (req, res) => {
 app.get("/signup", (req, res) => {
   res.render("signup");
 });
-
+app.get("/livelocation", (req, res) => {
+  res.render("livelocation");
+});
 app.get("/startride", (req, res) => {
   res.render("startride");
 });
@@ -716,7 +900,7 @@ app.post("/verify_otp2", async (req, res) => {
     req.session.user = user;
 
     // Redirect to home page
-    res.redirect("/startride");
+    res.redirect("/livelocation");
   } else {
     // Invalid OTP, render an error message
     res.render("otp_verification2", {
@@ -773,11 +957,12 @@ app.post("/verify_otp2", async (req, res) => {
 app.get("/", (req, res) => {
   res.render("landing"); // Render the 'login.ejs' template
 });
-let location2;
+
 
 app.post("/processLocation", (req, res) => {
   const { location2: receivedLocation2 } = req.body;
   console.log("Received location2:", receivedLocation2);
+  req.session.location2 = receivedLocation2
 
   // Assign the received location2 to the global variable
   location2 = receivedLocation2;
@@ -790,6 +975,7 @@ app.post("/processLocation", (req, res) => {
 app.get('/getLocation2', (req, res) => {
   try {
     const loggedInUser = req.session.user;
+    const location2 = req.session.location2;
     /* fetch location2 from wherever it's stored */;
 
     // Combine the user details and location2 into a single JSON object

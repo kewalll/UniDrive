@@ -20,7 +20,8 @@
     "mongoose": "^8.2.3",
     "nodemailer": "^6.9.13",
     "otp-generator": "^4.0.1",
-    "stripe": "^14.22.0"
+    "stripe": "^14.22.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Location Map</title>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Location Map</h1>
+  <div id="map"></div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w';
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [0, 0],
+      zoom: 8
+    });
+    const marker = new mapboxgl.Marker({
+      color: '#FF5733', // Marker color
+      draggable: false, // Set to true if you want the marker to be draggable
+      // Add custom icon image
+      icon: 'icon.jfif',
+    }).addTo(map);
+
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.addEventListener('message', function (event) {
+      const data = JSON.parse(event.data);
+      const { coordinates } = data;
+      const [lng, lat] = coordinates.split(',').map(parseFloat);
+
+      // Update map marker
+      map.flyTo({
+        center: [lng, lat],
+        essential: true
+      });
+    });
+  </script>
+</body>
+</html>
