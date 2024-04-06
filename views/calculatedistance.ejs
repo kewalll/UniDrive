@@ -80,6 +80,7 @@
     <script>
       // JavaScript code goes here
       // Fetch location2 from the server
+      
       fetch("/getLocation2")
         .then((response) => response.json())
         .then((data) => {
@@ -111,17 +112,20 @@
                       location2[0],
                       rideLatitude,
                       rideLongitude
-                    ).then((distance) => ({
+                    ).then((distance) => {
+                      if (distance<2){
+                        return{
                       firstname: ride.firstname,
                       lastname: ride.lastname,
                       gender: ride.gender,
                       availableSeats: ride.availableSeats,
                       departTime: ride.departTime,
                       email: ride.email,
-                      distance,
+                      distance,}
 
                       // rideId: ride._id,
-                    })) // Resolve the promise with rideId and distance
+                 } }) 
+                    // Resolve the promise with rideId and distance
                   );
                   calculateFare(location2);
                 });
@@ -184,18 +188,73 @@
 
         // Append distances to the list
         distancesList.forEach((item) => {
-          const listItem = document.createElement("li");
+          if(item){
+
+            const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
+          listItem.addEventListener("click", () => {
+            
+      // Function to be executed on click (replace with your desired logic)
+                 sendEmailToPublisher(item.email);
+                 console.log("email",item.user);
+        });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
                Distance: ${item.distance} km,    
                availableSeats:${item.availableSeats},    
-               Departure tt:${item.departTime},
-                Gender:${item.gender}`;
+               Departure At:${item.departTime},
+                Gender:${item.gender},
+                email:${item.email}`;
           distancesListElement.appendChild(listItem);
-        });
-      }
+       } });
 
+
+          
+          
+         }
+
+
+
+
+      function sendEmailToPublisher(publisherEmail) {
+    fetch('/sendEmail', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: publisherEmail })
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Email sent successfully');
+        } else {
+            console.error('Failed to send email');
+        }
+    })
+    .catch(error => {
+        console.error('Error sending email:', error);
+    });
+}
+    //   function displayDistances(distancesList) {
+    //   // Get the distances list element
+    //   const distancesListElement = document.getElementById("distances-list");
+
+    //   // Clear previous content
+    //   distancesListElement.innerHTML = "";
+
+    //   // Append distances to the list
+    //   distancesList.forEach((item) => {
+    //     const listItem = document.createElement("div");
+    //     listItem.classList.add("distance-item"); // Add the class name
+    //     listItem.addEventListener("click", () => {
+    //   // Function to be executed on click (replace with your desired logic)
+    //       console.log(Ride ID: ${item.rideId} clicked!);
+    //     });
+    //     listItem.textContent = Ride ID: ${item.rideId}, Distance: ${item.distance} km;
+    //     distancesListElement.appendChild(listItem);
+    //   });
+    // }
+     
       // Function to send distances data to the server
       function sendDistancesToServer(distancesList) {
         fetch("/calculateDistances", {

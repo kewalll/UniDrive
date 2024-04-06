@@ -69,6 +69,18 @@ function isLoggedIn(req, res, next) {
   }
 }
 
+// const express = require('express');
+// const nodemailer = require('nodemailer');
+// const bodyParser = require('body-parser');
+
+// const app = express();
+// const port = 3000; // You can change this to your desired port
+
+// Middleware to parse JSON bodies
+// app.use(bodyParser.json());
+
+// Endpoint to send email
+
 // const LocationSchema = new mongoose.Schema({
 //   coordinates: {
 //     type: String,
@@ -167,6 +179,12 @@ const LocationSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  email:{
+    type:String,
+    ref:"User",
+    required:true,
+    
+  }
 });
 const Location2Schema = new mongoose.Schema({
   coordinates: {
@@ -269,6 +287,7 @@ app.post("/storeLocation", isLoggedIn, async (req, res) => {
       gender: loggedInUser.gender,
       departTime: parsedDepartTime,
       availableSeats: availableSeats,
+      email: loggedInUser.email,
     });
 
     await newLocation.save();
@@ -290,7 +309,6 @@ app.post("/storeLocation2", isLoggedIn, async (req, res) => {
     const newLocation2 = new Location2({
       coordinates: location2.toString(),
       user: loggedInUser.email,
-
       firstname: loggedInUser.firstname,
       lastname: loggedInUser.lastname,
       gender: loggedInUser.gender,
@@ -307,8 +325,8 @@ app.post("/storeLocation2", isLoggedIn, async (req, res) => {
 });
 app.get('/fetchPublishedRides', async (req, res) => {
   try {
-    const publishedRides = await Location.find()
-      .populate('user'); // Populate user details
+    // Fetch published rides and populate user details
+    const publishedRides = await Location.find().populate('user', 'email'); // Ensure only email is populated
     res.json(publishedRides);
   } catch (error) {
     console.error('Error fetching published rides:', error);
@@ -373,6 +391,56 @@ app.get('/fetchPublishedRides', async (req, res) => {
 //       .json({ error: "An error occurred while calculating distances" });
 //   }
 // });
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: "unidrive534@gmail.com", // Your Gmail email address
+        pass: "pyqm nxjt hkwt ftep", }
+
+});
+
+// Define a route to handle sending emails
+app.post('/sendEmail',isLoggedIn, async(req, res) => {
+  const { email } = req.body;
+
+  const loggedInUser = req.session.user;
+  const otp = otpGenerator.generate(6, {
+    digits: true,
+    alphabets: false,
+    upperCase: false,
+    specialChars: false,
+  });
+  await sendOTP(email, otp);
+  req.session.otp = otp;
+
+  // Ensure the email and user details are available
+  if (!email || !loggedInUser) {
+    return res.status(400).send("Email and user details are required.");
+  }
+  
+  // Email content
+  const mailOptions = {
+    from: 'unidrive534@gmail.com',
+    to: email,
+    subject: 'Rider Selected your published ride',
+    text: `Ride info:\n\nUser Details:\nName: ${loggedInUser.firstname} ${loggedInUser.lastname}\nEmail: ${loggedInUser.email}\nGender: ${loggedInUser.gender}
+             Your OTP to start ride is  is: ${otp}`
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('Error sending email');
+    } else {
+      console.log('Email sent: ' + info.response);
+      res.status(200).send('Email sent successfully');
+    }
+  });
+});
+
 
 // Routes
 app.post('/calculateDistances', async (req, res) => {

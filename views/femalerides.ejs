@@ -78,7 +78,8 @@
       <!-- Your HTML content here -->
       <!-- Your HTML content here -->
   
-
+      <div id="not-eligible-message" style="color: red;"></div>
+      <div id="fare-output">Fare:</div>
     <!-- Your HTML content here -->
 
     <script>
@@ -127,13 +128,19 @@
                         // rideId: ride._id,
                       })) // Resolve the promise with rideId and distance
                     );
+                    calculateFare(location2);
+                    
                   }
+                   
                   else{
                     console.log("you are not eligible");
+                    // document.getElementById('not-eligible-message').innerText = "You are not eligible";
                   }
 
                   // Push the promise returned by calculateDistance to the array
                 });
+                
+    
 
                 // Wait for all distance calculations to complete
                 return Promise.all(distancePromises);
@@ -184,7 +191,8 @@
       }
 
       // Function to display distances on the web page
-      function displayDistances(distancesList) {
+     // Function to display distances on the web page
+     function displayDistances(distancesList) {
         // Get the distances list element
         const distancesListElement = document.getElementById("distances-list");
 
@@ -193,18 +201,42 @@
 
         // Append distances to the list
         distancesList.forEach((item) => {
-          const listItem = document.createElement("li");
-          listItem.classList.add("distance-item"); 
+          const listItem = document.createElement("div");
+          listItem.classList.add("distance-item");
+          listItem.addEventListener("click", () => {
+      // Function to be executed on click (replace with your desired logic)
+                 sendEmailToPublisher(item.email);
+                 console.log("email",item.user);
+        });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
-           Distance: ${item.distance} km,
-            Available Seats:${item.availableSeats},
-            Departure At:${item.departTime},
-            Gender:${item.gender}`;
+               Distance: ${item.distance} km,    
+               availableSeats:${item.availableSeats},    
+               Departure At:${item.departTime},
+                Gender:${item.gender},
+                email:${item.email}`;
           distancesListElement.appendChild(listItem);
         });
-      }
-
+         }
+         function sendEmailToPublisher(publisherEmail) {
+    fetch('/sendEmail', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: publisherEmail })
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Email sent successfully');
+        } else {
+            console.error('Failed to send email');
+        }
+    })
+    .catch(error => {
+        console.error('Error sending email:', error);
+    });
+}
       // Function to send distances data to the server
       function sendDistancesToServer(distancesList) {
         fetch("/calculateDistances", {
@@ -221,6 +253,49 @@
           .catch((error) =>
             console.error("Error sending distances data to server:", error)
           );
+      }
+      async function calculateFare(location2) {
+        // Assuming fare calculation based on location2 and distancesList
+        // You can modify this function according to your fare calculation logic
+        const destinationLat = 18.541007;
+        const destinationLon = 73.72778;
+        const link = `https://api.mapbox.com/directions/v5/mapbox/driving/${location2[0]},${location2[1]};${destinationLon},${destinationLat}?access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w`;
+
+        try {
+          const response = await fetch(link);
+          const data = await response.json();
+          const distanceInMeters = data.routes[0].distance;
+          const distanceInKilometers = distanceInMeters / 1000;
+
+          let totalFare = 0;
+
+          if (distanceInKilometers <= 3) {
+            // If distance is less than or equal to 3 km, use base fare for first 3 km
+            totalFare += 20;
+          } else {
+            // If distance is greater than 3 km, calculate fare based on additional km
+            totalFare += 20 + (distanceInKilometers - 3) * 7;
+          }
+          totalFare = totalFare.toFixed(2);
+          // Display fare in a separate section
+          displayFare(totalFare);
+        } catch (error) {
+          console.error("Error calculating distance:", error);
+          throw error;
+        }
+      }
+
+      function displayFare(fare) {
+        // Get the fare output element
+        const fareOutput = document.getElementById("fare-output");
+
+        // Clear previous content
+        fareOutput.innerHTML = "";
+
+        // Display fare
+        const fareElement = document.createElement("p");
+        fareElement.textContent = ` Fare: Rs.${fare}/-`;
+        fareOutput.appendChild(fareElement);
       }
     </script>
   </body>
