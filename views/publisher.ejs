@@ -21,11 +21,6 @@
       type="text/css"
     />
     <link rel="stylesheet" href="../public/publisher.css" />
-    <!-- <style>
-        #map { height: 500px;
-        width: 500px; 
-    flex: 1;} -->
-    <!-- </style> -->
   </head>
 
   <body
@@ -38,8 +33,74 @@
   >
     <div id="main">
       <div id="page1">
-        <nav>
-          <div style="display: flex; justify-content: space-between">
+
+        <div id="nav2">
+          <img src="../public/unidrive. (1920 x 500 px).png" alt="" class="small-nav-logo" onclick="window.location.href = '/home'">
+      <label class="popup">
+          <input type="checkbox">
+          <div class="burger" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <nav class="popup-window">
+            <legend>Commute</legend>
+            <ul>
+              <li>
+                <button onclick=
+                "window.location.href = '/passenger'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle r="4" cy="7" cx="9"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Request a Ride.</span>
+                </button>
+              </li>
+              <li>
+                <button onclick=
+                "window.location.href = '/publisher'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span>Publish a Ride.</span>
+                </button>
+              </li>
+              <hr>
+              <!-- <li> -->
+                <!-- <button onclick="window.location.href='/landing'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <rect ry="2" rx="2" height="13" width="13" y="9" x="9"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>About</span>
+                </button> -->
+              <!-- </li> -->
+              <li>
+                <button onclick="window.location.href='/home'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
+                  </svg>
+                  <span>Home</span>
+                </button>
+              </li>
+              <!-- <li>
+                <button>
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <line y2="18" x2="6" y1="6" x1="18"></line>
+                    <line y2="18" x2="18" y1="6" x1="6"></line>
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </li> -->
+            </ul>
+          </nav>
+        </label>
+      </div>
+        
+        <div class="nav-big">
             <img
               id="logo-image"
               onclick="window.location.href = '/home'"
@@ -67,47 +128,68 @@
               >
                 <a>Profile</a>
               </button>
-            </div>
-            <h3>Menu</h3>
           </div>
-        </nav>
+        </div>
+        
         <div id="map-container">
           <div id="map"></div>
           <div id="saerch-bar-div">
             <div id="geocoder" class="geocoder"></div>
           </div>
-          <div id="publisher-button-container">
-            <input type="hidden" id="departureDate" name="departureDate" value="">
+          <div id="publisher-pub-container">
             <div>
-              <input
-                type="time"
-                id="map-button2"
-                class="depart-time"
-                placeholder="Departure Time"
-                name="depart-time"
-              />
-              <i id="map-button3" class="bx bx-user">Time of Departure:</i>
-            </div>
-            <div>
-              <button
+              <!-- <button
                 id="publish-button"
                 onclick="window.location.href = '/publishernext'"
               >
                 Publish
+              </button> -->
+              <button class="animated-button" id="publish-button"
+              onclick="window.location.href = '/publishernext'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                  <path
+                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                  ></path>
+                </svg>
+                <span class="text">P U B L I S H</span>
+                <span class="circle"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
+                  <path
+                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                  ></path>
+                </svg>
               </button>
+              
             </div>
-            <div>
-              <input
-                type="text"
-                id="map-button1"
-                class="seats"
-                placeholder="Available Seats"
-                name="availableseats"
-              />
-              <i class="bx bx-user"></i>
+            <div class="time-seats">
+              <div class="something1">
+                <input
+                  type="time"
+                  id="map-button2"
+                  class="depart-time"
+                  placeholder="Departure Time"
+                  name="depart-time"
+                />
+                <i id="map-button3" class="bx bx-user">Time of Departure:</i>
+              </div>
+              <!-- <div class="input-container1">
+                <input type="time" name="text" class="input" id="map-button2" placeholder="Enter text">
+                <i id="map-button3" class="bx bx-user" style="
+                position: absolute;
+                top: 0;
+                right: -17rem;">Time of Departure:</i>
+                <div class="highlight"></div>
+              </div> -->
+              <div class="input-container">
+                <input type="text" name="text" class="input" id="map-button1" placeholder="Available Seats">
+                <i class="bx bx-user"></i>
+                <div class="highlight"></div>
+              </div>
             </div>
+            
           </div>
         </div>
+
       </div>
     </div>
     <script src="../public/publisher.js"></script>

@@ -9,8 +9,56 @@
   <body style="background-color: #efeae3">
     <div id="main">
       <div id="page1">
-        <nav style="display: flex">
-          <div style="display: flex; flex: 1; justify-content: space-between">
+
+        <div id="nav2">
+          <img src="../public/unidrive. (1920 x 500 px).png" alt="" class="small-nav-logo" onclick="window.location.href = '/home'">
+      <label class="popup">
+          <input type="checkbox">
+          <div class="burger" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <nav class="popup-window">
+            <legend>Commute</legend>
+            <ul>
+              <li>
+                <button onclick=
+                "window.location.href = '/passenger'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle r="4" cy="7" cx="9"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Request a Ride.</span>
+                </button>
+              </li>
+              <li>
+                <button onclick=
+                "window.location.href = '/publisher'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span>Publish a Ride.</span>
+                </button>
+              </li>
+              <hr>
+              <li>
+                <button onclick="window.location.href='/home'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
+                  </svg>
+                  <span>Home</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </label>
+      </div>
+        
+        <div class="nav-big">
             <img
               id="logo-image"
               onclick="window.location.href = '/home'"
@@ -38,10 +86,9 @@
               >
                 <a>Profile</a>
               </button>
-            </div>
-            <h3>Menu</h3>
           </div>
-        </nav>
+        </div>
+
         <div class="request-details-container">
           <div class="available-drivers-container">
             <h1
@@ -65,17 +112,31 @@
             >
               Approximate Fare:
             </h1>
-            <div id="distances-list"></div>
+              <div id="fare-output"></div>
+          </div>
+          <div class="female-container">
+            <!-- <button id="female" onclick="window.location.href = 'femalerides'">
+              female rides
+            </button> -->
+            <div class="checkbox-wrapper" id="female" onclick="window.location.href = 'femalerides'">
+              <input id="_checkbox-26" type="checkbox">
+              <label for="_checkbox-26">
+                <div class="tick_mark"></div>
+              </label>
+            </div>
+            <div class="filler-female">
+              Opt For Female Drivers Only?
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- Your HTML content here -->
     <!-- Your HTML content here -->
-    <div id="fare-output">Fare:</div>
-    <button id="female" onclick="window.location.href = 'femalerides'">
+    <!-- <div id="fare-output">Fare:</div> -->
+    <!-- <button id="female" onclick="window.location.href = 'femalerides'">
       female rides
-    </button>
+    </button> -->
 
     <script>
       // JavaScript code goes here
@@ -113,7 +174,7 @@
                       rideLatitude,
                       rideLongitude
                     ).then((distance) => {
-                      if (distance<10){
+                      if (distance<2){
                         return{
                       firstname: ride.firstname,
                       lastname: ride.lastname,
@@ -121,8 +182,7 @@
                       availableSeats: ride.availableSeats,
                       departTime: ride.departTime,
                       email: ride.email,
-                      distance,
-                       coordinates:ride.coordinates}
+                      distance,}
 
                       // rideId: ride._id,
                  } }) 
@@ -194,37 +254,10 @@
             const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
           listItem.addEventListener("click", () => {
-            const url = `/otp_verification2?email=${encodeURIComponent(item.email)}&gender=${encodeURIComponent(item.gender)}&coordinates=${encodeURIComponent(item.coordinates)}&firstname=${encodeURIComponent(item.firstname)}&lastname=${encodeURIComponent(item.lastname)}&distance=${encodeURIComponent(item.distance)}`;
-             window.location.href = url;
-
+            
       // Function to be executed on click (replace with your desired logic)
                  sendEmailToPublisher(item.email);
-                  const driver = {
-                   email: item.email,
-                   gender: item.gender,
-                   coordinates: item.coordinates,
-                   firstname: item.firstname,
-                   lastname: item.lastname,
-                   distance: item.distance
-                  };
-                 
-                  fetch('/driverdata', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(driver)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to save data to the database');
-        }
-        // Handle successful response (if needed)
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Handle error (if needed)
-    });             
+                 console.log("email",item.user);
         });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
@@ -236,6 +269,8 @@
           distancesListElement.appendChild(listItem);
        } });
 
+
+          
           
          }
 
@@ -338,7 +373,7 @@
 
         // Display fare
         const fareElement = document.createElement("p");
-        fareElement.textContent = ` Fare: Rs.${fare}/-`;
+        fareElement.textContent = ` Rs.${fare}/-`;
         fareOutput.appendChild(fareElement);
       }
     </script>
