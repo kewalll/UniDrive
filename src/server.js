@@ -437,8 +437,11 @@ app.post('/sendEmail',isLoggedIn, async(req, res) => {
     } else {
       console.log('Email sent: ' + info.response);
       res.status(200).send('Email sent successfully');
+       res.redirect("/otp_verification2");
     }
+    
   });
+ 
 });
 
 
@@ -518,6 +521,9 @@ app.get("/account", isLoggedIn, async (req, res) => {
       .json({ error: "An error occurred while fetching user profile" });
   }
 });
+app.get("/otp_verification2", (req, res) => {
+  res.render("otp_verification2");
+});
 // POST endpoint to store location
 // app.post("/storeLocation", isLoggedIn, async (req, res) => {
 //   try {
@@ -551,6 +557,11 @@ app.get("/account", isLoggedIn, async (req, res) => {
 app.get("/signup", (req, res) => {
   res.render("signup");
 });
+
+app.get("/startride", (req, res) => {
+  res.render("startride");
+});
+
 
 app.get("/publishernext", (req, res) => {
   res.render("publishernext");
@@ -691,6 +702,24 @@ app.post("/verify_otp", async (req, res) => {
   } else {
     // Invalid OTP, render an error message
     res.render("otp_verification", {
+      error: "Invalid OTP, please try again.",
+    });
+  }
+});
+app.post("/verify_otp2", async (req, res) => {
+  const { otp } = req.body;
+  const storedOTP = req.session.otp;
+
+  if (otp === storedOTP) {
+    // OTP is correct, set the user session
+    const user = req.session.user;
+    req.session.user = user;
+
+    // Redirect to home page
+    res.redirect("/startride");
+  } else {
+    // Invalid OTP, render an error message
+    res.render("otp_verification2", {
       error: "Invalid OTP, please try again.",
     });
   }

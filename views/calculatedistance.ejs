@@ -113,7 +113,7 @@
                       rideLatitude,
                       rideLongitude
                     ).then((distance) => {
-                      if (distance<2){
+                      if (distance<10){
                         return{
                       firstname: ride.firstname,
                       lastname: ride.lastname,
@@ -121,7 +121,8 @@
                       availableSeats: ride.availableSeats,
                       departTime: ride.departTime,
                       email: ride.email,
-                      distance,}
+                      distance,
+                       coordinates:ride.coordinates}
 
                       // rideId: ride._id,
                  } }) 
@@ -193,10 +194,13 @@
             const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
           listItem.addEventListener("click", () => {
-            
+            const url = `/otp_verification2?email=${encodeURIComponent(item.email)}&gender=${encodeURIComponent(item.gender)}&coordinates=${encodeURIComponent(item.coordinates)}&firstname=${encodeURIComponent(item.firstname)}&lastname=${encodeURIComponent(item.lastname)}&distance=${encodeURIComponent(item.distance)}`;
+             window.location.href = url;
       // Function to be executed on click (replace with your desired logic)
                  sendEmailToPublisher(item.email);
-                 console.log("email",item.user);
+                 
+
+                //  window.location.href = "/otp_verification2";
         });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
@@ -208,8 +212,6 @@
           distancesListElement.appendChild(listItem);
        } });
 
-
-          
           
          }
 

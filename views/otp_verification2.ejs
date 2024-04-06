@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification</title>
+  </head>
+  <body>
+    <h1>OTP Verification</h1>
+
+    <form action="/verify_otp2" method="POST">
+      <label for="otp">Enter OTP:</label>
+      <input type="text" id="otp" name="otp" required />
+      <button type="submit">Verify OTP</button>
+    </form>
+    <p>Email: <span id="email"></span></p>
+<p>Gender: <span id="gender"></span></p>
+<p>Coordinates: <span id="coordinates"></span></p>
+<p>First Name: <span id="firstname"></span></p>
+<p>Last Name: <span id="lastname"></span></p>
+
+    
+    
+  </body>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
+    const gender = urlParams.get('gender');
+    const coordinates = urlParams.get('coordinates');
+    const firstname = urlParams.get('firstname');
+    const lastname = urlParams.get('lastname');
+
+    const emailElement = document.getElementById('email');
+const genderElement = document.getElementById('gender');
+const coordinatesElement = document.getElementById('coordinates');
+const firstnameElement = document.getElementById('firstname');
+const lastnameElement = document.getElementById('lastname');
+
+// Set the inner HTML of these elements with the retrieved values
+emailElement.innerHTML = email;
+genderElement.innerHTML = gender;
+coordinatesElement.innerHTML = coordinates;
+firstnameElement.innerHTML = firstname;
+lastnameElement.innerHTML = lastname;
+
+
+    
+    // Display the details wherever needed on the page
+    console.log("Email:", email);
+    console.log("Gender:", gender);
+    console
+    </script>
+</html>
