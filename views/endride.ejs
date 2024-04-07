@@ -107,6 +107,8 @@ background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 
   
             <div class="request-details-container">
               <div class="available-drivers-container">
+                <div id="fare-output"></div>
+
                 <h3
                   style="
                     font-family: sans-serif;
@@ -137,6 +139,63 @@ background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 
   
             </div>
           </div>
+<script>
+            // Fetch fare information and update HTML
+// Fetch fare information and update HTML
+// Function to display the fare on the HTML page
+function displayFare(fare) {
+    const fareOutput = document.getElementById("fare-output");
+    fareOutput.textContent = `Fare: Rs.${fare}/-`;
+}
+
+// Fetch fare information and update HTML
+async function fetchAndDisplayFare() {
+    try {
+        // Make a fetch request to get the fare
+        const response = await fetch("/fetchfare");
+        const fareData = await response.json();
+        const location2 = fareData.rlocation2;
+        console.log(location2);
+
+        // Extract destination coordinates
+        const destinationLat = 18.541007;
+        const destinationLon = 73.72778;
+
+        // Construct the API link for calculating distance
+        const link = `https://api.mapbox.com/directions/v5/mapbox/driving/${location2[0]},${location2[1]};${destinationLon},${destinationLat}?access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w`;
+
+        try {
+            const response = await fetch(link);
+            const data = await response.json();
+            const distanceInMeters = data.routes[0].distance;
+            const distanceInKilometers = distanceInMeters / 1000;
+
+            let totalFare = 0;
+
+            if (distanceInKilometers <= 3) {
+                // If distance is less than or equal to 3 km, use base fare for first 3 km
+                totalFare += 20;
+            } else {
+                // If distance is greater than 3 km, calculate fare based on additional km
+                totalFare += 20 + (distanceInKilometers - 3) * 7;
+            }
+            totalFare = totalFare.toFixed(2);
+
+            // Display fare in a separate section
+            displayFare(totalFare);
+        } catch (error) {
+            console.error("Error calculating distance:", error);
+            throw error;
+        }
+    } catch (error) {
+        console.error("Error fetching fare:", error);
+    }
+}
+
+// Call the function to fetch and display fare when the page loads
+window.addEventListener("load", fetchAndDisplayFare);
+
+          </script>
   </body>
 
 </html>
