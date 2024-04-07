@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OTP Verification</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
     <link rel="stylesheet" href="../public/otpverification2.css">
     <link rel="stylesheet" href="../public/publisher2.css">
-  </head>
-  <body style="
+</head>
+<!-- <body>
+    <h1>Ride Ended</h1>
+    <p>Thanks for riding with us... Have a great day at university</p>
+    <h2>Please click below button for payment</h2>
+    <form action="/create-checkout-session" method="POST">
+        <button type="submit" id="checkout-button">Checkout</button>
+      </form>
+
+</body> -->
+
+<body style="
   background: rgb(239,234,227);
 background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 100%, rgba(174,254,255,1) 150%);">
   <div id="main">
@@ -104,21 +114,21 @@ background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 
                     margin-bottom: 2rem;
                   "
                 >
-                Enter the OTP to verify your Profile and Welcome to UniDrive.
+                Thanks for Riding With Us. <br><br>Have a great Day at Uni :D
                 </h3>
                 <div class="proceed-button-container">
                   <!-- <button onclick="refreshPage()">Proceed</button> -->
-                  <form action="/verify_otp" method="POST">
+                  <form action="/create-checkout-session" method="POST">
                     <!-- <label for="otp">Enter OTP:</label> -->
                     <!-- <input type="text" id="otp" name="otp" required /> -->
                     
-                    <input type="text" id="otp" name="otp" class="input" placeholder="Enter OTP">
+                    <!-- <input type="text" id="otp" name="otp" class="input" placeholder="Enter OTP"> -->
                     <!-- <button type="submit">Verify OTP</button> -->
-                    <button class="learn-more" type="submit">
+                    <button class="learn-more" type="submit" id="checkout-button">
                       <span class="circle" aria-hidden="true">
                       <span class="icon arrow"></span>
                       </span>
-                      <span class="button-text">Verify OTP</span>
+                      <span class="button-text">CheckOut</span>
                     </button>
                   </form>
                 </div>
@@ -128,4 +138,5 @@ background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 
             </div>
           </div>
   </body>
+
 </html>

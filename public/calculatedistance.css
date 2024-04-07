@@ -42,6 +42,8 @@ html, body {
 }
 
 #page1 {
+  background: rgb(239,234,227);
+background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 100%, rgba(174,254,255,1) 150%);
     min-height: 100vh;
     width: 100%;
     /* backgroun */
