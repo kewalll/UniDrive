@@ -345,10 +345,10 @@
 
           if (distanceInKilometers <= 3) {
             // If distance is less than or equal to 3 km, use base fare for first 3 km
-            totalFare += 20;
+            totalFare += 22;
           } else {
             // If distance is greater than 3 km, calculate fare based on additional km
-            totalFare += 20 + (distanceInKilometers - 3) * 7;
+            totalFare += 22 + (distanceInKilometers - 3) * 9;
           }
           totalFare = totalFare.toFixed(2);
           // Display fare in a separate section
