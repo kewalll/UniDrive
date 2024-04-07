@@ -149,7 +149,29 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
   });
 });
+app.get('/fetchfare', isLoggedIn, async (req, res) => {
+  try {
+    // Get the current user's email from the session or request parameters
+    const loggedInUser = req.session.user;
+    const currentUserEmail = loggedInUser.email;
 
+    // Fetch fare data from the database based on the user's email
+    const fareData = await Test.findOne({ remail: currentUserEmail });
+
+    // Check if fare data exists
+    if (!fareData) {
+      // If fare data is not found, return an appropriate response
+      return res.status(404).json({ error: 'Fare data not found for the current user' });
+    }
+
+    // If fare data exists, return it in the response
+    res.json(fareData); // Assuming fare is a field in your Test model
+  } catch (error) {
+    // If an error occurs, log it and send an error response
+    console.error('Error fetching fare:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 const sendOTP = async (email, otp) => {
   try {
