@@ -925,6 +925,7 @@ app.get("/publishernext", (req, res) => {
 //   });
 
 
+<<<<<<< HEAD
 // app.post("/login", async (req, res) => {
 //   const { email, password } = req.body;
 //   if (email && password) {
@@ -956,6 +957,8 @@ app.get("/publishernext", (req, res) => {
 //     });
 //   }
 // });
+=======
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -963,9 +966,11 @@ app.post("/login", async (req, res) => {
     try {
       const user = await User.findOne({ email });
 
+
       if (user) {
         // Compare the provided password with the hashed password stored in the database
         const isPasswordMatch = await bcrypt.compare(password, user.password);
+
 
         if (isPasswordMatch) {
           req.session.user = user; // Store user data in session
@@ -1005,7 +1010,11 @@ app.post("/signup", async (req, res) => {
     });
   }
 
+<<<<<<< HEAD
   // Email format validation - must end with @sitpune.edu.in
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
   const emailString = Array.isArray(email) ? email.join("") : email;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@sitpune\.edu\.in$/;
   if (!emailRegex.test(emailString)) {
@@ -1025,6 +1034,24 @@ app.post("/signup", async (req, res) => {
 
   const genderString = Array.isArray(gender) ? gender.join("") : gender;
 
+<<<<<<< HEAD
+=======
+
+  const otp = otpGenerator.generate(6, {
+    digits: true,
+    alphabets: false,
+    upperCase: false,
+    specialChars: false,
+  });
+  await sendOTP(email, otp);
+  req.session.otp = otp;
+
+
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(passwordString, 10); // 10 is the salt rounds
+
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
   try {
     // Check if the email already exists
     const existingUser = await User.findOne({ email: emailString });
@@ -1051,8 +1078,21 @@ app.post("/signup", async (req, res) => {
       gender: genderString,
     };
 
+<<<<<<< HEAD
     // Render OTP verification page
     res.render("otp_verification", { email: emailString });
+=======
+
+    await user.save();
+
+
+    // Store user data in session
+    req.session.user = user;
+
+
+    // Proceed to the next step, where the user enters the OTP
+    res.render("otp_verification", { email });
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
   } catch (error) {
     // Handle signup errors
     console.error("Signup error:", error);
@@ -1062,9 +1102,11 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+
 app.post("/verify_otp", async (req, res) => {
   const { otp } = req.body;
   const storedOTP = req.session.otp;
+
 
   if (otp === storedOTP) {
     // OTP is correct, proceed to save user details
@@ -1087,9 +1129,12 @@ app.post("/verify_otp", async (req, res) => {
     // Store user data in session
     req.session.user = user;
 
+<<<<<<< HEAD
     // Clear OTP from session
     delete req.session.otp;
     delete req.session.userDetails;
+=======
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
     // Redirect to home page
     res.redirect("/home");
@@ -1223,6 +1268,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -1296,3 +1342,5 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // app.listen(PORT, () => {
 //     console.log(`Server is running on http://localhost:${PORT}`);
 // });
+=======
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e

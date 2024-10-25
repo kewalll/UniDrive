@@ -15,13 +15,78 @@
 </head>
 
 <body style="
-background-color: #EFEAE3;
-background-image: url(bgimage2.jpg);
-background-repeat: no-repeat;
-background-size: cover;">
+background: rgb(239,234,227);
+background: linear-gradient(158deg, rgba(239,234,227,1) 60%, rgba(34,124,112,1) 100%, rgba(174,254,255,1) 150%);">
 <div id="main">
     <div id="page1">
-        <nav>
+
+        <div id="nav2">
+          <img src="../public/unidrive. (1920 x 500 px).png" alt="" class="small-nav-logo" onclick="window.location.href = '/home'">
+      <label class="popup">
+          <input type="checkbox">
+          <div class="burger" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <nav class="popup-window">
+            <legend>Commute</legend>
+            <ul>
+              <li>
+                <button onclick=
+                "window.location.href = '/passenger'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle r="4" cy="7" cx="9"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Request a Ride.</span>
+                </button>
+              </li>
+              <li>
+                <button onclick=
+                "window.location.href = '/publisher'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span>Publish a Ride.</span>
+                </button>
+              </li>
+              <hr>
+              <!-- <li> -->
+                <!-- <button onclick="window.location.href='/landing'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <rect ry="2" rx="2" height="13" width="13" y="9" x="9"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>About</span>
+                </button> -->
+              <!-- </li> -->
+              <li>
+                <button onclick="window.location.href='/home'">
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
+                  </svg>
+                  <span>Home</span>
+                </button>
+              </li>
+              <!-- <li>
+                <button>
+                  <svg stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none" viewBox="0 0 24 24" height="14" width="14" xmlns="http://www.w3.org/2000/svg">
+                    <line y2="18" x2="6" y1="6" x1="18"></line>
+                    <line y2="18" x2="18" y1="6" x1="6"></line>
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </li> -->
+            </ul>
+          </nav>
+        </label>
+      </div>
+        
+        <div class="nav-big">
             <div style="
             display:flex;
             justify-content: space-between;">
@@ -40,11 +105,9 @@ background-size: cover;">
             </div>
             <h3>Menu</h3>
             </div>
-        </nav>
-        <div id="success-prompt">
-            Ride Published Successfully!
         </div>
         
+<<<<<<< HEAD
         <button onclick="refreshPage()">Refresh</button>
     </div>
     <div>
@@ -54,6 +117,53 @@ background-size: cover;">
     </div>
     
 </div>
+=======
+
+
+        <!-- <div class="card">
+          <div class="card-details">
+            <div id="success-prompt">
+              Your ride has been published successfully. Kindly wait for a rider to accept your ride.<br>
+              Check your mail-box to get rider information and then click Proceed.
+          </div>
+          <div class="proceed-button-container">
+            <button onclick="refreshPage()">Proceed</button>
+          </div> -->
+          
+          <div class="request-details-container">
+            <div class="available-drivers-container">
+              <h3
+                style="
+                  font-family: sans-serif;
+                  font-size: 20px;
+                  margin-bottom: 2rem;
+                "
+              >
+              Your ride has been published successfully. Kindly wait for a rider to accept your ride.<br>
+              Check your mail-box to get rider information and then click Proceed.
+              </h3>
+              <div class="proceed-button-container">
+                <!-- <button onclick="refreshPage()">Proceed</button> -->
+                <button class="learn-more" onclick="refreshPage()">
+                  <span class="circle" aria-hidden="true">
+                  <span class="icon arrow"></span>
+                  </span>
+                  <span class="button-text">Proceed</span>
+                </button>
+              </div>
+            </div>
+            <div class="fair-container">
+              <h3>Rider Information:</h3>
+              <p>Name: <span id="name"></span></p>
+              <p>Email: <span id="email"></span></p>
+              <p>Location Link: <a id="location-link" href="#" target="_blank">View on Map</a></p>
+            </div>
+          </div>
+
+          </div>
+        </div>
+</body>
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 <script src="../public/publisher.js"></script>
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>

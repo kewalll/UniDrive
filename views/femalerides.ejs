@@ -76,16 +76,28 @@
     <button id="female" onclick="window.location.href = 'femalerides'">
       female rides
     </button>
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
     <script>
       // JavaScript code goes here
       // Fetch location2 from the server
+<<<<<<< HEAD
       
+=======
+     
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       fetch("/getLocation2")
         .then((response) => response.json())
         .then((data) => {
           const location2 = data.location2;
           console.log("Location2:", location2);
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
           // Now you can use location2 in your fetch request to /fetchPublishedRides and other functions
           fetch("/fetchPublishedRides")
@@ -93,6 +105,7 @@
             .then((publishedRides) => {
               // Array to store promises for each distance calculation
               const distancePromises = [];
+
 
               // Check if location2 is defined
               if (location2) {
@@ -106,6 +119,10 @@
                   );
                     if(data.gender=="female"&& ride.gender=="female")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
                     {
                       distancePromises.push(
                     calculateDistance(
@@ -125,17 +142,30 @@
                       distance,
                        coordinates:ride.coordinates}
 
+<<<<<<< HEAD
                       // rideId: ride._id,
                  } }) 
+=======
+
+                      // rideId: ride._id,
+                 } })
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
                     // Resolve the promise with rideId and distance
                   );
                   calculateFare(location2);
                     }
                   // Push the promise returned by calculateDistance to the array
                   else{
+<<<<<<< HEAD
                     
                   }
                 });
+=======
+                   
+                  }
+                });
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
                 // Wait for all distance calculations to complete
                 return Promise.all(distancePromises);
@@ -148,6 +178,7 @@
               // Display distances on the web page
               displayDistances(distancesList);
 
+
               // Send the distances data to the server
               sendDistancesToServer(distancesList);
             })
@@ -155,6 +186,7 @@
               console.error("Error fetching published rides:", error)
             );
         });
+
 
       // Function to calculate distance between two points using Haversine formula
       async function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -180,29 +212,41 @@
         }
       }
 
+
       // Function to convert degrees to radians
       function deg2rad(deg) {
         return deg * (Math.PI / 180);
       }
+
 
       // Function to display distances on the web page
       function displayDistances(distancesList) {
         // Get the distances list element
         const distancesListElement = document.getElementById("distances-list");
 
+
         // Clear previous content
         distancesListElement.innerHTML = "";
+
 
         // Append distances to the list
         distancesList.forEach((item) => {
           if(item){
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
             const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
           listItem.addEventListener("click", () => {
             const url = `/otp_verification2?email=${encodeURIComponent(item.email)}&gender=${encodeURIComponent(item.gender)}&coordinates=${encodeURIComponent(item.coordinates)}&firstname=${encodeURIComponent(item.firstname)}&lastname=${encodeURIComponent(item.lastname)}&distance=${encodeURIComponent(item.distance)}`;
              window.location.href = url;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       // Function to be executed on click (replace with your desired logic)
                  sendEmailToPublisher(item.email);
                   const driver = {
@@ -230,7 +274,11 @@
     .catch(error => {
         console.error('Error:', error);
         // Handle error (if needed)
+<<<<<<< HEAD
     });             
+=======
+    });            
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
         });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
@@ -242,12 +290,24 @@
           distancesListElement.appendChild(listItem);
        } });
 
+<<<<<<< HEAD
           
+=======
+
+         
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
          }
 
 
 
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       function sendEmailToPublisher(publisherEmail) {
     fetch('/sendEmail', {
         method: 'POST',
@@ -271,9 +331,17 @@
     //   // Get the distances list element
     //   const distancesListElement = document.getElementById("distances-list");
 
+<<<<<<< HEAD
     //   // Clear previous content
     //   distancesListElement.innerHTML = "";
 
+=======
+
+    //   // Clear previous content
+    //   distancesListElement.innerHTML = "";
+
+
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
     //   // Append distances to the list
     //   distancesList.forEach((item) => {
     //     const listItem = document.createElement("div");
@@ -311,20 +379,23 @@
         const destinationLon = 73.72778;
         const link = `https://api.mapbox.com/directions/v5/mapbox/driving/${location2[0]},${location2[1]};${destinationLon},${destinationLat}?access_token=pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w`;
 
+
         try {
           const response = await fetch(link);
           const data = await response.json();
           const distanceInMeters = data.routes[0].distance;
           const distanceInKilometers = distanceInMeters / 1000;
 
+
           let totalFare = 0;
+
 
           if (distanceInKilometers <= 3) {
             // If distance is less than or equal to 3 km, use base fare for first 3 km
-            totalFare += 20;
+            totalFare += 22;
           } else {
             // If distance is greater than 3 km, calculate fare based on additional km
-            totalFare += 20 + (distanceInKilometers - 3) * 7;
+            totalFare += 22 + (distanceInKilometers - 3) * 9;
           }
           totalFare = totalFare.toFixed(2);
           // Display fare in a separate section
@@ -335,12 +406,15 @@
         }
       }
 
+
       function displayFare(fare) {
         // Get the fare output element
         const fareOutput = document.getElementById("fare-output");
 
+
         // Clear previous content
         fareOutput.innerHTML = "";
+
 
         // Display fare
         const fareElement = document.createElement("p");
@@ -350,3 +424,5 @@
     </script>
   </body>
 </html>
+
+
