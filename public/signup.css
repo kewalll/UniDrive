@@ -175,6 +175,7 @@ header{
     color: #fff;
     font-size: small;
     margin-top: 10px;
+    align-items: center;
 }
 .two-col .one{
     display: flex;

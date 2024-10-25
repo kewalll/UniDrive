@@ -7,8 +7,12 @@
   </head>
   <body>
     <h1>OTP Verification</h1>
+    <% if (error) { %>
+      <div class="error" ><%= error %></div>
+    <% } %>
 
     <form action="/verify_otp" method="POST">
+
       <label for="otp">Enter OTP:</label>
       <input type="text" id="otp" name="otp" required />
       <button type="submit">Verify OTP</button>
