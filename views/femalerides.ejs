@@ -4,93 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fetch Published Rides</title>
+    <link rel="stylesheet" href="../public/calculatedistance.css" />
   </head>
-  <body>
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Fetch Published Rides</title>
-      <link rel="stylesheet" href="../public/calculatedistance.css">
-    </head>
-    <body style="
-    background-color: #EFEAE3;">
-      <div id="main">
-        <div id="page1">
-          <nav style="
-            display: flex;">
-            <div style="display: flex;
-            flex: 1; 
-            justify-content: space-between">
-              <img
-                id="logo-image"
-                onclick="window.location.href = '/home'"
-                src="../public/unidrive-high-resolution-logo-transparent.png"
-                alt=""
-                style="cursor: pointer"
-              />
-              <div id="nav-part2">
-                <button
-                  class="nav-butt"
-                  onclick="window.location.href = '/passenger'"
-                  style="background-color: #227c70; color: #efeae3"
-                >
-                  <a>Request a Ride</a>
-                </button>
-                <button
-                  class="nav-butt"
-                  onclick="window.location.href = '/publisher'"
-                  
-                >
-                  <a>Publish a Ride</a>
-                </button>
-                <button
-                  class="nav-butt"
-                  onclick="window.location.href='/account'"
-                >
-                  <a>Profile</a>
-                </button>
-              </div>
-              <h3>Menu</h3>
+  <body style="background-color: #efeae3">
+    <div id="main">
+      <div id="page1">
+        <nav style="display: flex">
+          <div style="display: flex; flex: 1; justify-content: space-between">
+            <img
+              id="logo-image"
+              onclick="window.location.href = '/home'"
+              src="../public/unidrive-high-resolution-logo-transparent.png"
+              alt=""
+              style="cursor: pointer"
+            />
+            <div id="nav-part2">
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/passenger'"
+                style="background-color: #227c70; color: #efeae3"
+              >
+                <a>Request a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href = '/publisher'"
+              >
+                <a>Publish a Ride</a>
+              </button>
+              <button
+                class="nav-butt"
+                onclick="window.location.href='/account'"
+              >
+                <a>Profile</a>
+              </button>
             </div>
-          </nav>
-          <div class="request-details-container">
-            <div class="available-drivers-container">
-              <h1 style="
+            <h3>Menu</h3>
+          </div>
+        </nav>
+        <div class="request-details-container">
+          <div class="available-drivers-container">
+            <h1
+              style="
                 font-family: sans-serif;
                 font-weight: 300;
-                margin-bottom: 2rem;">
-                Available rides:
-              </h1>
-              <div id="distances-list"></div>
-            </div>
-            <div class="fair-container">
-              <h1 style="
+                margin-bottom: 2rem;
+              "
+            >
+              Available rides:
+            </h1>
+            <div id="distances-list"></div>
+          </div>
+          <div class="fair-container">
+            <h1
+              style="
                 font-family: sans-serif;
                 font-weight: 300;
-                margin-bottom: 2rem;">
-                Approximate Fare:
-              </h1>
-              <div id="distances-list"></div>
-            </div>
+                margin-bottom: 2rem;
+              "
+            >
+              Approximate Fare:
+            </h1>
+            <div id="distances-list"></div>
           </div>
         </div>
       </div>
-      <!-- Your HTML content here -->
-      <!-- Your HTML content here -->
-  
-      <div id="not-eligible-message" style="color: red;"></div>
-      <div id="fare-output">Fare:</div>
+    </div>
     <!-- Your HTML content here -->
+    <!-- Your HTML content here -->
+    <div id="fare-output">Fare:</div>
+    <button id="female" onclick="window.location.href = 'femalerides'">
+      female rides
+    </button>
 
     <script>
       // JavaScript code goes here
       // Fetch location2 from the server
+      
       fetch("/getLocation2")
         .then((response) => response.json())
         .then((data) => {
           const location2 = data.location2;
           console.log("Location2:", location2);
-          console.log(data.gender);
 
           // Now you can use location2 in your fetch request to /fetchPublishedRides and other functions
           fetch("/fetchPublishedRides")
@@ -109,38 +104,38 @@
                   const rideLongitude = parseFloat(
                     ride.coordinates.split(",")[0]
                   );
-                  if (data.gender == 'female' && ride.gender == 'female') {
-                    distancePromises.push(
-                      calculateDistance(
-                        location2[1],
-                        location2[0],
-                        rideLatitude,
-                        rideLongitude
-                      ).then((distance) => ({
-                        firstname: ride.firstname,
-                        lastname: ride.lastname,
-                        gender: ride.gender,
-                        availableSeats: ride.availableSeats,
-                        departTime: ride.departTime,
-                        email: ride.email,
-                        distance,
+                    if(data.gender=="female"&& ride.gender=="female")
 
-                        // rideId: ride._id,
-                      })) // Resolve the promise with rideId and distance
-                    );
-                    calculateFare(location2);
+                    {
+                      distancePromises.push(
+                    calculateDistance(
+                      location2[1],
+                      location2[0],
+                      rideLatitude,
+                      rideLongitude
+                    ).then((distance) => {
+                      if (distance<10){
+                        return{
+                      firstname: ride.firstname,
+                      lastname: ride.lastname,
+                      gender: ride.gender,
+                      availableSeats: ride.availableSeats,
+                      departTime: ride.departTime,
+                      email: ride.email,
+                      distance,
+                       coordinates:ride.coordinates}
+
+                      // rideId: ride._id,
+                 } }) 
+                    // Resolve the promise with rideId and distance
+                  );
+                  calculateFare(location2);
+                    }
+                  // Push the promise returned by calculateDistance to the array
+                  else{
                     
                   }
-                   
-                  else{
-                    console.log("you are not eligible");
-                    // document.getElementById('not-eligible-message').innerText = "You are not eligible";
-                  }
-
-                  // Push the promise returned by calculateDistance to the array
                 });
-                
-    
 
                 // Wait for all distance calculations to complete
                 return Promise.all(distancePromises);
@@ -191,8 +186,7 @@
       }
 
       // Function to display distances on the web page
-     // Function to display distances on the web page
-     function displayDistances(distancesList) {
+      function displayDistances(distancesList) {
         // Get the distances list element
         const distancesListElement = document.getElementById("distances-list");
 
@@ -201,12 +195,42 @@
 
         // Append distances to the list
         distancesList.forEach((item) => {
-          const listItem = document.createElement("div");
+          if(item){
+
+            const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
           listItem.addEventListener("click", () => {
+            const url = `/otp_verification2?email=${encodeURIComponent(item.email)}&gender=${encodeURIComponent(item.gender)}&coordinates=${encodeURIComponent(item.coordinates)}&firstname=${encodeURIComponent(item.firstname)}&lastname=${encodeURIComponent(item.lastname)}&distance=${encodeURIComponent(item.distance)}`;
+             window.location.href = url;
+
       // Function to be executed on click (replace with your desired logic)
                  sendEmailToPublisher(item.email);
-                 console.log("email",item.user);
+                  const driver = {
+                   email: item.email,
+                   gender: item.gender,
+                   coordinates: item.coordinates,
+                   firstname: item.firstname,
+                   lastname: item.lastname,
+                   distance: item.distance
+                  };
+                 
+                  fetch('/driverdata', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(driver)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to save data to the database');
+        }
+        // Handle successful response (if needed)
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle error (if needed)
+    });             
         });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
@@ -216,9 +240,15 @@
                 Gender:${item.gender},
                 email:${item.email}`;
           distancesListElement.appendChild(listItem);
-        });
+       } });
+
+          
          }
-         function sendEmailToPublisher(publisherEmail) {
+
+
+
+
+      function sendEmailToPublisher(publisherEmail) {
     fetch('/sendEmail', {
         method: 'POST',
         headers: {
@@ -237,6 +267,26 @@
         console.error('Error sending email:', error);
     });
 }
+    //   function displayDistances(distancesList) {
+    //   // Get the distances list element
+    //   const distancesListElement = document.getElementById("distances-list");
+
+    //   // Clear previous content
+    //   distancesListElement.innerHTML = "";
+
+    //   // Append distances to the list
+    //   distancesList.forEach((item) => {
+    //     const listItem = document.createElement("div");
+    //     listItem.classList.add("distance-item"); // Add the class name
+    //     listItem.addEventListener("click", () => {
+    //   // Function to be executed on click (replace with your desired logic)
+    //       console.log(Ride ID: ${item.rideId} clicked!);
+    //     });
+    //     listItem.textContent = Ride ID: ${item.rideId}, Distance: ${item.distance} km;
+    //     distancesListElement.appendChild(listItem);
+    //   });
+    // }
+     
       // Function to send distances data to the server
       function sendDistancesToServer(distancesList) {
         fetch("/calculateDistances", {
