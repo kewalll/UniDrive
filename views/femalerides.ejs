@@ -76,18 +76,28 @@
     <button id="female" onclick="window.location.href = 'femalerides'">
       female rides
     </button>
+<<<<<<< HEAD
+=======
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
     <script>
       // JavaScript code goes here
       // Fetch location2 from the server
+<<<<<<< HEAD
+      
+=======
      
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       fetch("/getLocation2")
         .then((response) => response.json())
         .then((data) => {
           const location2 = data.location2;
           console.log("Location2:", location2);
+<<<<<<< HEAD
+=======
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
           // Now you can use location2 in your fetch request to /fetchPublishedRides and other functions
           fetch("/fetchPublishedRides")
@@ -109,7 +119,10 @@
                   );
                     if(data.gender=="female"&& ride.gender=="female")
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
                     {
                       distancePromises.push(
                     calculateDistance(
@@ -129,19 +142,30 @@
                       distance,
                        coordinates:ride.coordinates}
 
+<<<<<<< HEAD
+                      // rideId: ride._id,
+                 } }) 
+=======
 
                       // rideId: ride._id,
                  } })
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
                     // Resolve the promise with rideId and distance
                   );
                   calculateFare(location2);
                     }
                   // Push the promise returned by calculateDistance to the array
                   else{
+<<<<<<< HEAD
+                    
+                  }
+                });
+=======
                    
                   }
                 });
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
 
                 // Wait for all distance calculations to complete
                 return Promise.all(distancePromises);
@@ -209,14 +233,20 @@
         distancesList.forEach((item) => {
           if(item){
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
             const listItem = document.createElement("div");
           listItem.classList.add("distance-item");
           listItem.addEventListener("click", () => {
             const url = `/otp_verification2?email=${encodeURIComponent(item.email)}&gender=${encodeURIComponent(item.gender)}&coordinates=${encodeURIComponent(item.coordinates)}&firstname=${encodeURIComponent(item.firstname)}&lastname=${encodeURIComponent(item.lastname)}&distance=${encodeURIComponent(item.distance)}`;
              window.location.href = url;
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       // Function to be executed on click (replace with your desired logic)
                  sendEmailToPublisher(item.email);
                   const driver = {
@@ -244,7 +274,11 @@
     .catch(error => {
         console.error('Error:', error);
         // Handle error (if needed)
+<<<<<<< HEAD
+    });             
+=======
     });            
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
         });
           // listItem.textContent = `Ride ID: ${item.rideId},Email: ${item.user}, Distance: ${item.distance} km`;
           listItem.textContent = `Name:${item.firstname + item.lastname}
@@ -256,17 +290,24 @@
           distancesListElement.appendChild(listItem);
        } });
 
+<<<<<<< HEAD
+          
+=======
 
          
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
          }
 
 
 
 
+<<<<<<< HEAD
+=======
 
 
 
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
       function sendEmailToPublisher(publisherEmail) {
     fetch('/sendEmail', {
         method: 'POST',
@@ -290,11 +331,17 @@
     //   // Get the distances list element
     //   const distancesListElement = document.getElementById("distances-list");
 
+<<<<<<< HEAD
+    //   // Clear previous content
+    //   distancesListElement.innerHTML = "";
+
+=======
 
     //   // Clear previous content
     //   distancesListElement.innerHTML = "";
 
 
+>>>>>>> eb4a7f8951574d5af19b1d6e41df236f0825e71e
     //   // Append distances to the list
     //   distancesList.forEach((item) => {
     //     const listItem = document.createElement("div");

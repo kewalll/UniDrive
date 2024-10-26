@@ -756,8 +756,9 @@ app.post("/calculateDistances", async (req, res) => {
   }
 });
 app.get("/login", (req, res) => {
-  res.render("login");
+  res.render("login", { error: null }); // Ensure error is defined
 });
+
 app.get("/landing", (req, res) => {
   res.render("landing");
 });
@@ -858,7 +859,7 @@ app.get("/otp_verification2", (req, res) => {
 
 
 app.get("/signup", (req, res) => {
-  res.render("signup");
+  res.render("signup", { error: null });
 });
 app.get("/livelocation", (req, res) => {
   res.render("livelocation");
@@ -924,8 +925,40 @@ app.get("/publishernext", (req, res) => {
 //   });
 
 
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+//   if (email && password) {
+//     try {
+//       const user = await User.findOne({ email });
+
+
+//       if (user) {
+//         // Compare the provided password with the hashed password stored in the database
+//         const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+
+//         if (isPasswordMatch) {
+//           req.session.user = user; // Store user data in session
+//           res.redirect("/home");
+//         } else {
+//           res.redirect("/login");
+//         }
+//       } else {
+//         res.redirect("/login");
+//       }
+//     } catch (error) {
+//       console.error("Error logging in:", error);
+//       res.status(500).send("An error occurred while processing your request");
+//     }
+//   } else {
+//     res.render("/login", {
+//       error: "Email and password are mandatory",
+//     });
+//   }
+// });
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
   if (email && password) {
     try {
       const user = await User.findOne({ email });
@@ -940,34 +973,59 @@ app.post("/login", async (req, res) => {
           req.session.user = user; // Store user data in session
           res.redirect("/home");
         } else {
-          res.redirect("/login");
+          // Password does not match
+          res.render("login", {
+            error: "Incorrect password. Please try again.",
+          });
         }
       } else {
-        res.redirect("/login");
+        // Email does not exist in the database
+        res.render("login", {
+          error: "Email not found. Please check your email and try again.",
+        });
       }
     } catch (error) {
       console.error("Error logging in:", error);
       res.status(500).send("An error occurred while processing your request");
     }
   } else {
-    res.render("/login", {
+    // Email or password is missing in the form submission
+    res.render("login", {
       error: "Email and password are mandatory",
     });
   }
 });
 
 
+
 app.post("/signup", async (req, res) => {
   const { firstname, lastname, email, password, gender } = req.body;
+
+  // Validate mandatory fields
   if (!email || !password || !firstname || !gender) {
     return res.render("signup", {
-      error: "Email and password are mandatory",
+      error: "Firstname, email, password, and gender are mandatory fields.",
     });
   }
 
-
+  // Email format validation - must end with @sitpune.edu.in
   const emailString = Array.isArray(email) ? email.join("") : email;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@sitpune\.edu\.in$/;
+  if (!emailRegex.test(emailString)) {
+    return res.render("signup", {
+      error: "Please use a valid SIT Pune email address.",
+    });
+  }
+
+  // Password strength validation - at least 7 characters, one digit, one uppercase, and one special character
   const passwordString = Array.isArray(password) ? password.join("") : password;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{7,}$/;
+  if (!passwordRegex.test(passwordString)) {
+    return res.render("signup", {
+      error: "Password must be at least 7 characters long, include one uppercase letter, one digit, and one special character.",
+    });
+  }
+
   const genderString = Array.isArray(gender) ? gender.join("") : gender;
 
 
@@ -985,25 +1043,35 @@ app.post("/signup", async (req, res) => {
   const hashedPassword = await bcrypt.hash(passwordString, 10); // 10 is the salt rounds
 
 
+
   try {
-    const user = new User({
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email: emailString });
+    if (existingUser) {
+      return res.render("signup", {
+        error: "This email is already registered. Please use a different email.",
+      });
+    }
+
+    // Generate OTP
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      alphabets: false,
+      upperCase: false,
+      specialChars: false,
+    });
+    await sendOTP(emailString, otp);
+    req.session.otp = otp;
+    req.session.userDetails = {
       firstname,
       lastname,
       email: emailString,
-      password: hashedPassword,
-      gender: genderString, // Store hashed password in the database
-    });
+      password: passwordString, // Store raw password temporarily for hashing after OTP verification
+      gender: genderString,
+    };
 
-
-    await user.save();
-
-
-    // Store user data in session
-    req.session.user = user;
-
-
-    // Proceed to the next step, where the user enters the OTP
-    res.render("otp_verification", { email });
+    // Render OTP verification page
+    res.render("otp_verification", { email: emailString });
   } catch (error) {
     // Handle signup errors
     console.error("Signup error:", error);
@@ -1020,10 +1088,29 @@ app.post("/verify_otp", async (req, res) => {
 
 
   if (otp === storedOTP) {
-    // OTP is correct, set the user session
-    const user = req.session.user;
+    // OTP is correct, proceed to save user details
+    const { firstname, lastname, email, password, gender } = req.session.userDetails;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+
+    // Create and save user
+    const user = new User({
+      firstname,
+      lastname,
+      email,
+      password: hashedPassword,
+      gender, // Store hashed password in the database
+    });
+
+    await user.save();
+
+    // Store user data in session
     req.session.user = user;
 
+    // Clear OTP from session
+    delete req.session.otp;
+    delete req.session.userDetails;
 
     // Redirect to home page
     res.redirect("/home");
@@ -1034,6 +1121,7 @@ app.post("/verify_otp", async (req, res) => {
     });
   }
 });
+
 app.post("/verify_otp2", async (req, res) => {
   const { otp } = req.body;
   const storedOTP = req.session.otp;
@@ -1156,3 +1244,76 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 
+
+
+
+
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const bodyParser = require('body-parser');
+// const userRoutes = require('../routes/userRoutes');
+// const dotenv = require('dotenv');
+// const locationRoutes = require('../routes/locationRoutes');
+// const location2Routes = require('../routes/location2Routes');
+// const riderRoutes = require('../routes/riderRoutes');
+// const path = require("path");
+// const session = require('express-session'); // Include express-session
+
+// dotenv.config();
+// const app = express();
+// const PORT = process.env.PORT || 3000;
+// // Middleware
+// app.use(bodyParser.json()); // Parse JSON request bodies
+// app.use(bodyParser.urlencoded({ extended: true }));
+// // Routes
+// app.use('/api/users', userRoutes);
+// app.use('/api/locations', locationRoutes);
+// app.use('/api/location2', location2Routes);
+// app.use('/api/riders', riderRoutes);
+
+
+// // Set up session middleware
+// app.use(session({
+//   secret: process.env.SECRET|| 'your_secret_key', // Use a strong secret
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: { secure: false } // Set 'secure: true' if using HTTPS
+// }));
+
+// // Set up view engine
+// app.set("view engine", "ejs"); // Set EJS as the view engine
+// app.set("views", path.join(__dirname, "../views"));
+// app.use("/public", express.static(path.join(__dirname, "../public")));
+
+
+
+// // Database connection
+// const dbURI = process.env.MONGODB_URI; // Read the URI from .env
+// console.log("MongoDB URI: ", dbURI); // Log for debugging
+
+// mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+//   .then(() => console.log('MongoDB connected successfully'))
+//   .catch(err => console.error('MongoDB connection error:', err));
+
+
+// app.get("/", (req, res) => {
+//   res.render("landing"); 
+// });
+
+// app.get("/login", (req, res) => {
+//   res.render("login");
+// });
+
+// app.get("/home", (req, res) => {
+//   // Check if the user is authenticated
+//   if (req.session.user) {
+//     res.render("home", { user: req.session.user }); // Render the 'home.ejs' template
+//   } else {
+//     res.redirect("/login"); // Redirect to login if not authenticated
+//   }
+// });
+
+// // Start the server
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+// });

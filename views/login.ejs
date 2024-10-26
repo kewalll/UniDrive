@@ -94,6 +94,11 @@
                 <header>Login</header>
             </div>
            
+            <% if (error) { %>
+                <div class="error-message" style="color: white; margin-bottom: 15px;">
+                  <%= error %>
+                </div>
+              <% } %>
 
             
             <div class="input-box">

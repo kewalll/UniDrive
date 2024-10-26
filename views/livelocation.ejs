@@ -20,31 +20,51 @@
   <script>
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2V3YWwyMTA1IiwiYSI6ImNsdTA1NXoyMTA3aWkyaW13OHNqZ2h4bDQifQ.JqrilNyDxi9flLHowJlH3w';
 
+    console.log("Initializing map...");
+
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [0, 0],
+      center: [73.8567, 18.5204],
       zoom: 8
     });
+
+    console.log("Map initialized.");
+
     const marker = new mapboxgl.Marker({
       color: '#FF5733', // Marker color
       draggable: false, // Set to true if you want the marker to be draggable
       // Add custom icon image
-      icon: 'icon.jfif',
+      icon: './iconn.png',
     }).addTo(map);
+
+    console.log("Marker added to the map.");
 
     const socket = new WebSocket('ws://localhost:8080');
 
+    socket.addEventListener('open', function () {
+      console.log("WebSocket connection established.");
+    });
+
     socket.addEventListener('message', function (event) {
+      console.log("Message received from server:", event.data);
       const data = JSON.parse(event.data);
+      console.log("Parsed data:", data);
       const { coordinates } = data;
+      console.log("Received coordinates:", coordinates);
       const [lng, lat] = coordinates.split(',').map(parseFloat);
+      console.log("Parsed coordinates - Longitude:", lng, "Latitude:", lat);
 
       // Update map marker
       map.flyTo({
         center: [lng, lat],
         essential: true
       });
+      console.log("Map marker updated.");
+    });
+
+    socket.addEventListener('close', function () {
+      console.log("WebSocket connection closed.");
     });
   </script>
 </body>
